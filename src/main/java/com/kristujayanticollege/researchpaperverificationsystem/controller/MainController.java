@@ -127,11 +127,9 @@ public class MainController {
 				return map;
 			}
 
-			Thread.sleep(10000);
-			/*
-			for(int i=0; i<ids.size(); i++) {
+			for (int i = 0; i < ids.size(); i++) {
 				researchDetailsRepositoryService.deleteResearchDetailsById(ids.get(i));
-			}*/
+			}
 
 			map.put("status", "success");
 			map.put("message", "Successfuly deleted");
@@ -207,7 +205,7 @@ public class MainController {
 		}
 	}
 
-	@GetMapping(path = "verify-file/{id}")
+	@GetMapping(path = "/verify-file/{id}")
 	public @ResponseBody HashMap<String, String> verify(@PathVariable Long id) {
 
 		System.out.println(id);
@@ -231,22 +229,20 @@ public class MainController {
 			service.setWebClientBuilder(webClientBuilder);
 			service.setObjectMapper(objectMapper);
 
-			//Thread.sleep(10000);
-
 			if (researchDetailsRows != null) {
 				for (int i = 0; i < researchDetailsRows.size(); i++) {
 
-					if(researchDetailsRows.get(i).getIndexing() != null)
-					if (researchDetailsRows.get(i).getIndexing().equalsIgnoreCase("SCOPUS")) {
-						try {
-							service.setApiKey(apiKey);
-							service.setResearchDetailsRow(researchDetailsRows.get(i));
-							service.verify();
-							service.saveStatus(verificationRepositoryService, researchDetailsRepositoryService);
-						} catch (Exception e) {
-							break;
+					if (researchDetailsRows.get(i).getIndexing() != null)
+						if (researchDetailsRows.get(i).getIndexing().equalsIgnoreCase("SCOPUS")) {
+							try {
+								service.setApiKey(apiKey);
+								service.setResearchDetailsRow(researchDetailsRows.get(i));
+								service.verify();
+								service.saveStatus(verificationRepositoryService, researchDetailsRepositoryService);
+							} catch (Exception e) {
+								break;
+							}
 						}
-					}
 				}
 
 			}
@@ -264,25 +260,17 @@ public class MainController {
 
 	}
 
-	@GetMapping(path = "verify-row/{id}")
-	public @ResponseBody HashMap<String, String> verifyRow(@PathVariable Long id) {
+	@PostMapping(path = "/verify-rows")
+	public @ResponseBody HashMap<String, String> verifyRow(@RequestBody List<Long> ids) {
 
 		HashMap<String, String> map = new HashMap<>();
 
 		// TODO: add for different indexing
 		try {
-			Map<String, Object> researchDetails = researchDetailsRepositoryService.getResearchDetailsById(id);
 
-			if (researchDetails == null) {
-				map.put("status", "not_found");
-				map.put("message", "id not found");
-				return map;
-			}
-			ResearchDetailsRow row = objectMapper.convertValue(researchDetails, ResearchDetailsRow.class);
-
-			if (!(row.getIndexing().equalsIgnoreCase("SCOPUS"))) {
-				map.put("status", "not_found");
-				map.put("message", "indexing not supported yet");
+			if (ids == null || ids.isEmpty()) {
+				map.put("status", "invalid_request");
+				map.put("message", "empty list");
 				return map;
 			}
 
@@ -290,10 +278,24 @@ public class MainController {
 			service.setWebClientBuilder(webClientBuilder);
 			service.setObjectMapper(objectMapper);
 
-			service.setApiKey(apiKey);
-			service.setResearchDetailsRow(row);
-			service.verify();
-			service.saveStatus(verificationRepositoryService, researchDetailsRepositoryService);
+			for (int i = 0; i < ids.size(); i++) {
+				Map<String, Object> researchDetails = researchDetailsRepositoryService
+						.getResearchDetailsById(ids.get(i));
+
+				if (researchDetails == null)
+					continue;
+				ResearchDetailsRow row = objectMapper.convertValue(researchDetails, ResearchDetailsRow.class);
+
+				if (row.getIndexing() != null)
+					if (row.getIndexing().equalsIgnoreCase("SCOPUS")) {
+						service.setApiKey(apiKey);
+						service.setResearchDetailsRow(row);
+						service.verify();
+						service.saveStatus(verificationRepositoryService, researchDetailsRepositoryService);
+					} else
+						Thread.sleep(5000);
+
+			}
 
 			map.put("status", "success");
 			map.put("message", "verification successful");

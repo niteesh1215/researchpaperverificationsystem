@@ -653,7 +653,6 @@ fileUploadsListView = {
         <i class="tim-icons icon-trash-simple"></i>
       </button>
     </td>`;
-      console.log(obj);
       tableBody.append(`<tr><td class="text-center">${i}</td><td title="yyyy-mm-dd">${obj.date}</td><td>${obj.fileName}</td><td>${obj.description}</td>${actionTd}</tr>`);
       i++;
     });
@@ -692,7 +691,7 @@ fileUploadsListView = {
     var myPiechart = utilities.generateOrangeShadesPiechart("indexChart", jsonIndexWiseCoutData);
 
     var detailsTableView = $('#detailsTableView');
-    console.log(fileUploadsListView.selectedFileName);
+
     $(".table-card .card-title").html(fileUploadsListView.selectedFileName);
     detailsTableView.html(`<div class="text-center loading-indicator"><div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>`);
 
@@ -714,10 +713,15 @@ fileUploadsListView = {
 
 
     var i = 1;
+
+
     jsonData.forEach((row) => {
+
+      var checkedStatus = fileUploadsListView.checkedList.includes(`${row.id}`) ? "checked" : "";
+      
       var checkbox = `<div class="form-check">
       <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" value="" data-index="${row.id}">
+        <input class="form-check-input" type="checkbox" value="" ${checkedStatus} data-index="${row.id}">
         <span class="form-check-sign">
           <span class="check"></span>
         </span>
@@ -742,9 +746,9 @@ fileUploadsListView = {
       var id = $(this).attr("data-index");
       var filename = $(this).attr("data-filename");
       fileUploadsListView.selectedFileId = id;
-      fileUploadsListView.fieldName = filename;
+      fileUploadsListView.selectedFileName = filename;
 
-      fileUploadsListView.checkedList=[];
+      fileUploadsListView.checkedList = [];
 
       fileUploadsListView.fetchResearchDetailsAndBuildUI();
 
@@ -778,11 +782,8 @@ fileUploadsListView = {
           timeout: 600000,
           success: function (data) {
             utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> File was deleted successfuly.');
-            var fileName = $(".table-card .card-title").html(fileName);
-
           },
           error: function (e) {
-            //console.log("hi");
             console.log(e);
             utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to delete the file.');
           }
@@ -817,7 +818,7 @@ fileUploadsListView = {
       $.ajax({
         type: "get",
         contentType: "application/json",
-        url: `verify-file/${fileUploadsListView.selectedFileId}`,
+        url: `/verify-file/${fileUploadsListView.selectedFileId}`,
         dataType: 'json',
         cache: false,
         timeout: 600000,
@@ -880,6 +881,7 @@ fileUploadsListView = {
       $('#confirmButton').on('click', function (e) {
         confirmationModel.modal('hide');
         $(this).unbind();
+        utilities.showNotification('top', 'center', type.info, '<strong>Delete initiated!</strong> Please wait....',3000);
         $.ajax({
           type: "post",
           contentType: "application/json",
@@ -889,7 +891,14 @@ fileUploadsListView = {
           cache: false,
           timeout: 600000,
           success: function (data) {
-            $(".selection-count").addClass(hidden);
+
+            /*
+              -Hide the selected count displaying element and the action buttons (edit,delete etc.)
+              -Empty the checkedList since the fields the are deleted.
+              -Rebuild the ui, with updated data
+            */
+            $(".selection-count,.action-buttons").addClass('hidden');
+            fileUploadsListView.checkedList = [];
             fileUploadsListView.fetchResearchDetailsAndBuildUI();
             utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Row(s) deleted successfuly.');
 
@@ -914,8 +923,31 @@ fileUploadsListView = {
     });
 
     //row verify button listener
-    $('#reVerifyRowButton').on('click', (e) => {
-      alert(this.checkedList);
+    $('#reVerifyRowButton').on('click', function () {
+
+      utilities.showNotification('top', 'center', type.info, '<strong>Reverifying!</strong> Please wait....',3000);
+      $.ajax({
+        type: "post",
+        contentType: "application/json",
+        url: '/verify-rows',
+        dataType: 'json',
+        data: JSON.stringify(fileUploadsListView.checkedList),
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+          if (data.status === 'success') {
+            fileUploadsListView.fetchResearchDetailsAndBuildUI();
+            utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Row(s) re-verified successfuly.');
+
+          } else
+            utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to re-verify the row(s).');
+
+        },
+        error: function (e) {
+          utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to re-verify the row(s).');
+        }
+      });
+
     });
 
     //row verification info button listener
