@@ -1,0 +1,433 @@
+<!--
+=========================================================
+* * Black Dashboard - v1.0.1
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/black-dashboard
+* Copyright 2019 Creative Tim (https://www.creative-tim.com)
+
+
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/apple-icon.png}">
+  <link rel="icon" type="image/png" th:href="@{/img/favicon.png}">
+  <title>
+    Research Paper Verification System
+  </title>
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
+  <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+  <!-- Nucleo Icons -->
+  <link th:href="@{/assets/css/nucleo-icons.css}" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link th:href="@{/assets/css/black-dashboard.css?v=1.0.0}" rel="stylesheet" />
+  <!--date picker stylesheet-->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css" />
+
+  <!-- CSS Just for demo purpose, don't include it in your project -->
+  <link href="/assets/demo/demo.css" rel="stylesheet" />
+</head>
+
+<body class="">
+  <div class="wrapper">
+    <div class="sidebar" data-background-color="white">
+      <div class="sidebar-wrapper">
+        <div class="logo">
+          <!--<a href="javascript:void(0)" class="simple-text logo-mini">
+            RPVS
+          </a> -->
+          <a href="javascript:void(0)" class="simple-text logo-normal">
+            Menu
+          </a>
+        </div>
+        <ul class="nav">
+          <li class="active ">
+            <a href="/upload.html">
+              <i class="tim-icons icon-cloud-upload-94"></i>
+              <p>Upload</p>
+            </a>
+          </li>
+          <li>
+            <a href="/upload-list">
+              <i class="tim-icons icon-bullet-list-67"></i>
+              <p>Uploads List</p>
+            </a>
+          </li>
+          <li>
+            <a href="/modify-column">
+              <i class="tim-icons icon-puzzle-10"></i>
+              <p>Column List</p>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="main-panel">
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
+        <div class="container-fluid">
+          <div class="navbar-wrapper">
+            <div class="navbar-toggle d-inline">
+              <button type="button" class="navbar-toggler">
+                <span class="navbar-toggler-bar bar1"></span>
+                <span class="navbar-toggler-bar bar2"></span>
+                <span class="navbar-toggler-bar bar3"></span>
+              </button>
+            </div>
+            <a class="h6 navbar-brand" href="javascript:void(0)">Research Paper Details V S</a>
+          </div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-bar navbar-kebab"></span>
+            <span class="navbar-toggler-bar navbar-kebab"></span>
+            <span class="navbar-toggler-bar navbar-kebab"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navigation">
+            <ul class="navbar-nav ml-auto">
+              <li class="search-bar input-group">
+                <button class="btn btn-link" id="search-button" data-toggle="modal" data-target="#searchModal"><i
+                    class="tim-icons icon-zoom-split"></i>
+                  <span class="d-lg-none d-md-block">Search</span>
+                </button>
+              </li>
+              <li class="dropdown nav-item">
+                <a href="javascript:void(0)" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                  <div class="notification d-none d-lg-block d-xl-block"></div>
+                  <i class="tim-icons icon-sound-wave"></i>
+                  <p class="d-lg-none">
+                    Notifications
+                  </p>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right dropdown-navbar">
+                  <li class="nav-link"><a href="#" class="nav-item dropdown-item">Mike John responded to your email</a>
+                  </li>
+                  <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">You have 5 more
+                      tasks</a></li>
+                  <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Your friend Michael
+                      is in town</a></li>
+                  <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Another
+                      notification</a></li>
+                  <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Another one</a></li>
+                </ul>
+              </li>
+              <li class="dropdown nav-item">
+                <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                  <div class="photo">
+                    <img src="../assets/img/anime3.png" alt="Profile Photo">
+                  </div>
+                  <b class="caret d-none d-lg-block d-xl-block"></b>
+                  <p class="d-lg-none">
+                    Log out
+                  </p>
+                </a>
+                <ul class="dropdown-menu dropdown-navbar">
+                  <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Profile</a></li>
+                  <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Settings</a></li>
+                  <li class="dropdown-divider"></li>
+                  <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Log out</a></li>
+                </ul>
+              </li>
+              <li class="separator d-lg-none"></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <div class="modal modal-search fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModal"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="SEARCH">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Navbar -->
+      <div class="content">
+        <div class="row">
+          <div class="col-12">
+            <div class="modal fade bd-example-modal-lg" id="file-upload-form-model" tabindex="-1" role="dialog">
+              <div class="modal-dialog modal-lg ">
+                <div class="modal-content bg-warning p-2">
+                  <div class="card m-0">
+                    <div class="card-header d-flex justify-content-between">
+                      <h2 class="card-title">
+                        File details form
+                      </h2>
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <i class="tim-icons icon-simple-remove text-danger"></i>
+                      </button>
+                    </div>
+                    <div class="card-body">
+                      <form id='file-upload-form' action="/save">
+                        <div class="form-group">
+                          <label for="filename">File Name</label>
+                          <input type="text" class="form-control" name="filename" aria-describedby="filename_help"
+                            placeholder="Enter the file name" required>
+                          <small id="filename_help" class="form-text text-muted">File name should be unique.</small>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="date">Date</label>
+                          <input type="text" class="form-control" name="date" aria-describedby="filename_help"
+                            placeholder="Enter date (dd/mm/yyyy)" required readonly>
+                          <div class="invalid-feedback">
+                            Please pick a date.
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="description">Description</label>
+                          <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card card-chart">
+              <div class="card-header ">
+                <div class="row">
+                  <div class="col-12 text-left d-flex justify-content-between">
+                    <div>
+                      <h5 class="card-category">Excel File</h5>
+                      <h2 class="card-title">Upload</h2>
+                    </div>
+
+                    <button
+                      class="btn btn-default btn-fab btn-icon btn-round btn_ripple float-right hidden upload-button"
+                      title="upload button">
+                      <i class="tim-icons icon-cloud-upload-94"></i>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+              <div class="card-body">
+                <br />
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="d-flex justify-content-center justify-content-sm-end  align-items-center">
+                      <input type="file" id="actual-upload-btn"
+                        accept=".xls,.xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                        hidden />
+
+                      <label class="btn btn-primary animation-on-hover" for="actual-upload-btn">
+                        <i class="tim-icons icon-paper"></i> &nbsp;&nbsp; Choose File
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 d-flex justify-content-center justify-content-sm-start align-items-center">
+                    <h4 class="mb-0" id="file-chosen">No file selected.</h4>
+                  </div>
+
+                </div>
+
+                <br />
+                <br />
+                <!--<div class="chart-area">
+                   <canvas id="chartBig1"></canvas> 
+                </div>
+                -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row hidden">
+          <div class="col-lg-2">
+            <div class="row">
+              <div class="col-4 col-lg-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="card-category">Total</h5>
+                    <h4 class="card-title total-count"><i
+                        class="tim-icons icon-paper text-warning"></i>&nbsp;&nbsp;<span></span>
+                    </h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4 col-lg-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="card-category">Verified</h5>
+                    <h4 class="card-title verified-count"><i
+                        class="tim-icons icon-check-2 text-success"></i>&nbsp;&nbsp;<span></span></h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4 col-lg-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="card-category">Unverified</h5>
+                    <h4 class="card-title unverified-count"><i
+                        class="tim-icons icon-simple-remove text-danger"></i>&nbsp;&nbsp;<span></span></h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card card-chart">
+              <div class="card-header">
+                <h5 class="card-category">Department-Wise Count</h5>
+                <!--<h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> 763,215</h3> -->
+              </div>
+              <div class="card-body">
+                <div class="chart-area">
+                  <canvas id="chartLinePurple"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card card-chart">
+              <div class="card-header">
+                <h5 class="card-category">Indexing-Wise Count</h5>
+                <!--<h3 class="card-title"><i class="tim-icons icon-delivery-fast text-info"></i> 3,500€</h3> -->
+              </div>
+              <div class="card-body">
+                <div class="chart-area">
+                  <canvas id="indexChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--
+          <div class="col-lg-4">
+            <div class="card card-chart">
+              <div class="card-header">
+                <h5 class="card-category">Completed Tasks</h5>
+                <h3 class="card-title"><i class="tim-icons icon-send text-success"></i> 12,100K</h3> 
+              </div>
+              <div class="card-body">
+                <div class="chart-area">
+                  <canvas id="chartLineGreen"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        -->
+        </div>
+
+        <div class="rown hidden">
+          <div class="col-12 p-0">
+            <div class="card table-card p-4">
+              <div class="card-header">
+                <h4 class="card-title "></h4>
+                <h6 class="h6" style="color:#1f8ef1;"> Shift + Scroll to scroll horizontally</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-fix-height" id="table-preview">
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!--   Core JS Files   -->
+  <script th:src="@{/assets/js/core/jquery.min.js}"></script>
+  <script th:src="@{/assets/js/core/popper.min.js}"></script>
+  <script th:src="@{/assets/js/core/bootstrap.min.js}"></script>
+  <script th:src="@{/assets/js/plugins/perfect-scrollbar.jquery.min.js}"></script>
+  <!--Excel to json convertor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/shim.min.js"
+    integrity="sha512-nPnkC29R0sikt0ieZaAkk28Ib7Y1Dz7IqePgELH30NnSi1DzG4x+envJAOHz8ZSAveLXAHTR3ai2E9DZUsT8pQ=="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"
+    integrity="sha512-wBcFatf7yQavHQWtf4ZEjvtVz4XkYISO96hzvejfh18tn3OrJ3sPBppH0B6q/1SHB4OKHaNNUKqOmsiTGlOM/g=="
+    crossorigin="anonymous"></script>
+
+  <!-- Chart JS -->
+  <script th:src="@{/assets/js/plugins/chartjs.min.js}"></script>
+  <!--  Notifications Plugin    -->
+  <script th:src="@{/assets/js/plugins/bootstrap-notify.js}"></script>
+  <!-- Control Center for Black Dashboard: parallax effects, scripts for the example pages etc -->
+  <script th:src="@{/assets/js/black-dashboard.min.js?v=1.0.0}"></script>
+  <!-- Black Dashboard DEMO methods, don't include it in your project! -->
+  <script th:src="@{/assets/demo/demo.js}"></script>
+
+  <!--date picker script-->
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+  <script>
+    $(document).ready(function () {
+
+      $().ready(function () {
+        $sidebar = $('.sidebar');
+        $navbar = $('.navbar');
+        $main_panel = $('.main-panel');
+
+        $full_page = $('.full-page');
+
+        $sidebar_responsive = $('body > .navbar-collapse');
+        sidebar_mini_active = true;
+        white_color = false;
+
+        window_width = $(window).width();
+
+
+        $('.switch-sidebar-mini input').on("switchChange.bootstrapSwitch", function () {
+          var $btn = $(this);
+
+          if (sidebar_mini_active == true) {
+            $('body').removeClass('sidebar-mini');
+            sidebar_mini_active = false;
+            blackDashboard.showSidebarMessage('Sidebar mini deactivated...');
+          } else {
+            $('body').addClass('sidebar-mini');
+            sidebar_mini_active = true;
+            blackDashboard.showSidebarMessage('Sidebar mini activated...');
+          }
+
+          // we simulate the window Resize so the charts will get updated in realtime.
+          var simulateWindowResize = setInterval(function () {
+            window.dispatchEvent(new Event('resize'));
+          }, 180);
+
+          // we stop the simulation of Window Resize after the animations are completed
+          setTimeout(function () {
+            clearInterval(simulateWindowResize);
+          }, 1000);
+        });
+      });
+    });
+  </script>
+  <script>
+    $(document).ready(function () {
+      uploadView.init();
+    });
+  </script>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS &&
+      TrackJS.install({
+        token: "ee6fab19c5a04ac1a32a645abde4613a",
+        application: "research-paper-verification-system"
+      });
+  </script>
+</body>
+
+</html>
