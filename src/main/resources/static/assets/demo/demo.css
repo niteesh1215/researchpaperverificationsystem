@@ -230,3 +230,14 @@
 }
 
 /* table card end */
+
+/* select option background color */
+  select option{
+    background-color:#27293d;
+  }
+/* select option background color end*/
+
+#displayForm{
+ max-height: 90vh;
+ overflow-y: scroll;
+};
