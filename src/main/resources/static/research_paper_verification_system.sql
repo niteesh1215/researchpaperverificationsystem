@@ -117,4 +117,32 @@ ADD CONSTRAINT `group_id_foreign_key`
     REFERENCES `research_paper_verification_system`.`research_details` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION);
+    
+    
+ALTER TABLE `research_paper_verification_system`.`column_map` 
+ADD COLUMN `data_length` INT NOT NULL DEFAULT 300 AFTER `mapped_name`;
+
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '50' WHERE (`id` = '1');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '100' WHERE (`id` = '2');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '10' WHERE (`id` = '3');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '255' WHERE (`id` = '4');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '100' WHERE (`id` = '5');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '100' WHERE (`id` = '6');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '100' WHERE (`id` = '8');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '100' WHERE (`id` = '9');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '100' WHERE (`id` = '10');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '150' WHERE (`id` = '13');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '10' WHERE (`id` = '15');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '10' WHERE (`id` = '14');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '10' WHERE (`id` = '16');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '20' WHERE (`id` = '17');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '30' WHERE (`id` = '18');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '10' WHERE (`id` = '19');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '255' WHERE (`id` = '20');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '255' WHERE (`id` = '21');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '255' WHERE (`id` = '22');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '5' WHERE (`id` = '23');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '5' WHERE (`id` = '24');
+UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '5' WHERE (`id` = '25');
+
 
