@@ -16,6 +16,8 @@ public class ColumnMap {
 
     private String  mappedName;
 
+    private Integer dataLength;
+
     public Long getId() {
         return id;
     }
@@ -38,5 +40,13 @@ public class ColumnMap {
 
     public void setMappedName(String mappedName) {
         this.mappedName = mappedName;
+    }
+
+    public Integer getDataLength() {
+        return dataLength;
+    }
+
+    public void setDataLength(Integer dataLength) {
+        this.dataLength = dataLength;
     }
 }
