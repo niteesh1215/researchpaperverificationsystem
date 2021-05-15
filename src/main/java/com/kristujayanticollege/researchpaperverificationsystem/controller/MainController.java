@@ -317,5 +317,4 @@ public class MainController {
 		else
 			return new VerificationDetails();
 	}
-
 }
