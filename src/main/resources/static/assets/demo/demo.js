@@ -179,7 +179,8 @@ utilities = {
       return totalVerified;
     },
     getUniqueFieldCount: function (jsonObject, fieldName) {
-      var arr = jsonObject, obj = {};
+      var arr = jsonObject,
+        obj = {};
       for (var i = 0; i < arr.length; i++) {
         if (!obj[arr[i][fieldName]]) {
           obj[arr[i][fieldName]] = 1;
@@ -188,7 +189,11 @@ utilities = {
         }
       }
       return obj;
-    }
+    },
+    scrollToTop:function(){
+      console.log('scrolling to top');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
   },
   api: {
     getColumnMapping: function () {
@@ -232,8 +237,7 @@ uploadView = {
     try {
       columnMap = await utilities.api.getColumnMapping();
       console.log(columnMap);
-    }
-    catch (rejectedValue) {
+    } catch (rejectedValue) {
       utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> Please check the internet connection and refresh the page (Server cannot be reached).');
     }
     if (columnMap == undefined)
@@ -268,7 +272,9 @@ uploadView = {
         fileReader.readAsBinaryString(file);
         fileReader.onload = (event) => {
           let data = event.target.result;
-          let workbook = XLSX.read(data, { type: "binary" });
+          let workbook = XLSX.read(data, {
+            type: "binary"
+          });
           console.log(workbook);
 
           sheet = workbook.SheetNames[0];
@@ -350,7 +356,9 @@ uploadView = {
         i++;
       });
 
-      $("#table-preview table td").css({ "text-align": "center", });
+      $("#table-preview table td").css({
+        "text-align": "center",
+      });
 
 
       $("#table-preview table tbody tr").on("mouseenter mouseleave", "td", function () {
@@ -401,7 +409,10 @@ uploadView = {
         autoclose: true,
       });
 
-      dateField.css({ "color": "rgba(255, 255, 255, 0.8)", "cursor": "default" });
+      dateField.css({
+        "color": "rgba(255, 255, 255, 0.8)",
+        "cursor": "default"
+      });
 
     });
 
@@ -494,7 +505,7 @@ columnListView = {
         <i class="tim-icons icon-trash-simple"></i>
       </button>
     </td>`;
-      tableBody.append(`<tr><td class="text-center">${obj.id}</td><td>${obj.columnName}</td><td>${obj.mappedName}</td>${actionTd}</tr>`);
+      tableBody.append(`<tr><td class="text-center">${obj.id}</td><td>${obj.columnName}</td><td>${obj.mappedName}</td><td>${obj.dataLength}</td>${actionTd}</tr>`);
     });
 
 
@@ -523,8 +534,6 @@ columnListView = {
         return obj;
       }, {});
 
-      console.log(columnDetails);
-
       $(this).trigger("reset");
 
       $('#addColumMappingModel').modal('hide');
@@ -537,23 +546,24 @@ columnListView = {
         dataType: 'json',
         cache: false,
         timeout: 600000,
-        success: async function (data) {
+        success: function (data) {
+          reloadColumnMapping();
 
-          //console.log("data");
-          //console.log(data);
-
-          utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Column was added successfuly.');
-
-          try {
-            columnListView.buildTable(await utilities.api.getColumnMapping());
-          } catch (rejectedValue) {
-            utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> Please check the internet connection and refresh the page (Server cannot be reached).');
-          }
         },
         error: function (e) {
           utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to add the column (' + e.responseJSON.message + ').');
         }
       });
+
+      async function reloadColumnMapping() {
+        utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Column was added successfuly.');
+        try {
+          columnListView.buildTable(await utilities.api.getColumnMapping());
+        } catch (rejectedValue) {
+          utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> Please check the internet connection and refresh the page (Server cannot be reached).');
+        }
+      }
+
     });
 
     //deleteButton listener
@@ -580,26 +590,23 @@ columnListView = {
           dataType: 'json',
           cache: false,
           timeout: 600000,
-          success: async function (data) {
-
-            //console.log("data");
-            //console.log(data);
-
-            utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Column was deleted successfuly.');
-            try {
-              columnListView.buildTable(await utilities.api.getColumnMapping());
-            } catch (rejectedValue) {
-              utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> Please check the internet connection and refresh the page (Server cannot be reached).');
-            }
-
+          success: function (data) {
+            reloadColumnMapping();
           },
           error: function (e) {
-            //console.log("hi");
-            console.log(e);
             utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to delete the column.');
           }
         });
 
+        async function reloadColumnMapping() {
+          utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Column was deleted successfuly.');
+          try {
+            columnListView.buildTable(await utilities.api.getColumnMapping());
+          } catch (rejectedValue) {
+            utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> Please check the internet connection and refresh the page (Server cannot be reached).');
+          }
+
+        }
       });
 
       $('#closeModel').on('click', (e) => {
@@ -619,6 +626,7 @@ fileUploadsListView = {
     this.addEventListeners();
   },
   columnMaps: [],
+  selectedFileJsonData: undefined,
   checkedList: [],
   selectedFileName: "",
   selectedFileId: undefined,
@@ -668,6 +676,8 @@ fileUploadsListView = {
       cache: false,
       timeout: 600000,
       success: function (data) {
+
+        fileUploadsListView.selectedFileJsonData = data;
         fileUploadsListView.buildDetailsUi(data);
       },
       error: function (e) {
@@ -704,6 +714,7 @@ fileUploadsListView = {
     }
     if (this.columnMaps.length == 0)
       return;
+
     detailsTableView.empty();
     detailsTableView.append(`<table class=""><tr class="text-primary"><th class="text-center text-primary">#</th><th>Select</th></tr></table>`);
     this.columnMaps.forEach(function (obj) {
@@ -718,15 +729,17 @@ fileUploadsListView = {
     jsonData.forEach((row) => {
 
       var checkedStatus = fileUploadsListView.checkedList.includes(`${row.id}`) ? "checked" : "";
-      
-      var checkbox = `<div class="form-check">
+
+      var checkbox = /*html*/ `
+      <div class="form-check">
       <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" value="" ${checkedStatus} data-index="${row.id}">
+        <input class="form-check-input" type="checkbox" value="" ${checkedStatus} data-id="${row.id}" data-index="${i-1}">
         <span class="form-check-sign">
           <span class="check"></span>
         </span>
       </label>
-    </div>`;
+      </div>`;
+
       detailsTableView.find('table').append(`<tr><td>${i}</td><td>${checkbox}</td></tr>`);
       this.columnMaps.forEach(function (obj) {
         detailsTableView.find('table tr').eq(i).append(`<td title="${obj.mappedName}">${row[obj.columnName]}</td>`);
@@ -736,6 +749,51 @@ fileUploadsListView = {
     });
 
     detailsTableView.find('table').addClass('table table-hover table-bordered text-center');
+
+  },
+
+  buildForm:function (index) {
+
+    var jsonObj = fileUploadsListView.selectedFileJsonData[index];
+    var form = '<form>';
+
+    this.columnMaps.forEach(function (obj) {
+      var typeSelectFields = ['is_publication_mandatory_phd_requirement', 'is_publication_outcome_of_shodh_pravartan_or_irg', 'is_authorship_affiliated_to_kjc'];
+
+
+      if (typeSelectFields.includes(obj.columnName)) {
+        var options = jsonObj[obj.columnName].trim().toLowerCase() == 'yes' ? `<option selected>yes</option>
+        <option>no</option>`: `<option>yes</option>
+        <option selected>no</option>`;
+
+        form += `
+        <div class="form-group">
+        <label for="${obj.columnName}">${obj.mappedName}</label>
+        <select class="form-control" id="${obj.columnName}">
+          ${options}
+        </select>
+      </div>
+        `;
+
+      } else {
+        var inputType = obj.columnName === 'year' ? 'number' : 'text';
+
+        form += `<div class="form-group">
+      <label for="${obj.columnName}">${obj.mappedName}</label>
+      <input type="${inputType}" class="form-control" value="${jsonObj[obj.columnName]}" id="${obj.columnName}" aria-describedby="${obj.columnName}Help" placeholder="Enter ${obj.mappedName}" required maxlength="${obj.dataLength}">
+      <small id="${obj.columnName}Help" class="form-text text-muted">Max ${obj.dataLength} characters allowed.</small>
+    </div>`;
+      }
+
+
+    });
+
+    form +='<button class="btn btn-warning" id="closeEditFormBtn">Cancel</button>';
+    form += '<button type="submit" class="btn btn-primary float-right">Update</button>';
+
+    form = form + '</form';
+
+    return form;
 
   },
 
@@ -850,11 +908,16 @@ fileUploadsListView = {
       if (this.checkedList.length === 0) {
         $(".action-buttons, .selection-count").removeClass('hidden');
       }
-      var data = $(e.target).attr('data-index');
+      var id = $(e.target).attr('data-id');
+      var index = $(e.target).attr('data-index');
+
       if (e.target.checked)
-        this.checkedList.push(data);
+        this.checkedList.push({
+          'id': id,
+          'index': index,
+        });
       else
-        this.checkedList = this.checkedList.filter(item => item !== data);
+        this.checkedList = this.checkedList.filter(item => item.id !== id);
 
       if (this.checkedList.length === 0)
         $(".action-buttons, .selection-count").addClass('hidden');
@@ -881,13 +944,14 @@ fileUploadsListView = {
       $('#confirmButton').on('click', function (e) {
         confirmationModel.modal('hide');
         $(this).unbind();
-        utilities.showNotification('top', 'center', type.info, '<strong>Delete initiated!</strong> Please wait....',3000);
+        utilities.showNotification('top', 'center', type.info, '<strong>Delete initiated!</strong> Please wait....', 3000);
+        const ids = fileUploadsListView.checkedList.map(obj => obj.id);
         $.ajax({
           type: "post",
           contentType: "application/json",
           url: '/delete-rows',
           dataType: 'json',
-          data: JSON.stringify(fileUploadsListView.checkedList),
+          data: JSON.stringify(ids),
           cache: false,
           timeout: 600000,
           success: function (data) {
@@ -919,19 +983,34 @@ fileUploadsListView = {
 
     //row edit button listener
     $('#editRowButton').on('click', (e) => {
-      alert(this.checkedList);
+
+      $('#detailsView').addClass('hidden');
+      var formContainer = $('#editFormContainer');
+      utilities.showNotification('top', 'center', type.info, '<strong>Multiple rows selected!</strong> Choosing the first selected.', 3000);
+      formContainer.find('.card-title').html('Update Details');
+      formContainer.removeClass('hidden');
+      $('#displayForm').html(fileUploadsListView.buildForm(fileUploadsListView.checkedList[0].index));
+      utilities.functions.scrollToTop();
+    });
+
+    $('#editFormContainer').on('click','#closeEditFormBtn',function(e) {
+      $('#editFormContainer').addClass('hidden');
+      $('#displayForm').empty();
+      $('#detailsView').removeClass('hidden');
+      utilities.functions.scrollToTop();
     });
 
     //row verify button listener
     $('#reVerifyRowButton').on('click', function () {
 
-      utilities.showNotification('top', 'center', type.info, '<strong>Reverifying!</strong> Please wait....',3000);
+      utilities.showNotification('top', 'center', type.info, '<strong>Reverifying!</strong> Please wait....', 3000);
+      const ids = fileUploadsListView.checkedList.map(obj => obj.id);
       $.ajax({
         type: "post",
         contentType: "application/json",
         url: '/verify-rows',
         dataType: 'json',
-        data: JSON.stringify(fileUploadsListView.checkedList),
+        data: JSON.stringify(ids),
         cache: false,
         timeout: 600000,
         success: function (data) {
