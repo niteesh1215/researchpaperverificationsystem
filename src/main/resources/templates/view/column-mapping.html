@@ -180,8 +180,14 @@
 
                   <div class="form-group">
                     <label for="mappedName">Mapped name</label>
-                    <input class="form-control" name="mappedName" placeholder="Enter mapped name" required>
+                    <input class="form-control" type="text" name="mappedName" placeholder="Enter mapped name" required>
                     <small id="columnName_help" class="form-text text-muted">Mapped name should be unique.</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="dataLength">Maximum characters allowed</label>
+                    <input class="form-control" type="number" name="dataLength" placeholder="Enter count" required>
+                    <small id="dataLength_help" class="form-text text-muted">Maximum number of characters that is field can have.</small>
                   </div>
 
                   <button type="submit" class="btn btn-primary">Submit</button>
@@ -239,6 +245,9 @@
                         </th>
                         <th>
                           Mapped Name
+                        </th>
+                        <th>
+                          Max.Character Count
                         </th>
                         <th class="text-right">
                           Action
