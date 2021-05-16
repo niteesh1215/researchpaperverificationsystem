@@ -168,7 +168,7 @@
                             <h4 class="modal-title" id="confirmationModelLabel">Confirm</h4>
                         </div>
                         <div class="modal-body">
-                            
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" id="closeModel">Close</button>
@@ -308,35 +308,41 @@
 
                     <div class="row">
                         <div class="col-12">
-                            <div class="card table-card p-4">
+                            <div class="card table-card p-2">
                                 <div class="card-header">
-                                    <div class="d-flex justify-content-between">
-                                        <h4 class="card-title "></h4>
-                                        <div class="action-buttons hidden">
-                                            <button
-                                                class="btn btn-danger animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
-                                                id="deleteRowButton" title="delete row">
-                                                <i class="tim-icons icon-trash-simple"></i>
-                                            </button>
-                                            <button
-                                                class="btn btn-warning animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
-                                                id="editRowButton" title="edit row">
-                                                <i class="tim-icons icon-pencil"></i>
-                                            </button>
-                                            <button
-                                                class="btn btn-success animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
-                                                id="reVerifyRowButton" title="re-verify">
-                                                <i class="tim-icons icon-refresh-01"></i>
-                                            </button>
-                                            <button
-                                                class="btn btn-info animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
-                                                id="rowVerificationInfoButton" title="verification info">
-                                                <i class="tim-icons icon-alert-circle-exc"></i>
-                                            </button>
+                                    <div class="row">
+                                        <div class="col-lg-8 col-xl-8 col-7">
+                                            <h4 class="card-title d-none d-md-block d-lg-block d-xl-block"></h4>
+                                            <h6 class="card-title d-block d-md-none d-lg-none d-xl-none"></h6>
+                                            <h6 class="text-info mt-2"> Shift + Scroll to scroll horizontally</h6>
+                                        </div>
+                                        <div class="col-lg-4 col-xl-4 col-5">
+                                            <div class="action-buttons hidden">
+                                                <button
+                                                    class="btn btn-danger animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
+                                                    id="deleteRowButton" title="delete row">
+                                                    <i class="tim-icons icon-trash-simple"></i>
+                                                </button>
+                                                <button
+                                                    class="btn btn-warning animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
+                                                    id="editRowButton" title="edit row">
+                                                    <i class="tim-icons icon-pencil"></i>
+                                                </button>
+                                                <button
+                                                    class="btn btn-success animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
+                                                    id="reVerifyRowButton" title="re-verify">
+                                                    <i class="tim-icons icon-refresh-01"></i>
+                                                </button>
+                                                <button
+                                                    class="btn btn-info animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
+                                                    id="rowVerificationInfoButton" title="verification info">
+                                                    <i class="tim-icons icon-alert-circle-exc"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <h6 class="h6" style="color:#1f8ef1;"> Shift + Scroll to scroll horizontally</h6>
+                                    
                                 </div>
                                 <div class="card-body">
                                     <h4 class="selection-count hidden mb-2 text-center"></h4>
@@ -346,23 +352,23 @@
                                 </div>
                             </div>
                         </div>
-                    </div> 
+                    </div>
 
                 </div>
 
-                <div class="row hidden" id="editFormContainer">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title"></h4>
-                            </div>
-                            <div class="card-body" id="displayForm">
-                               
-                            </div>
+                <div id="customModal" class="custom-modal">
+                    <!-- Modal content -->
+                    <div class="custom-modal-content card">
+                        <div class="card-header">
+                            <span class="custom-modal-close text-danger">&times;</span>
+                            <h4 class="card-title"></h4>
+                            <p class="text-info">Scroll down</p>
+                        </div>
+                        <div class="card-body" id="displayForm">
+
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
