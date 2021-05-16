@@ -190,9 +190,34 @@ utilities = {
       }
       return obj;
     },
-    scrollToTop:function(){
+    scrollToTop: function () {
       console.log('scrolling to top');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    addCustomModalListener: function (modelOpeningElementSelector, staticWrapper = true) {
+      var modal = $('#customModal');
+
+      // Get the button that opens the modal
+      var openingElement = $(modelOpeningElementSelector);
+
+      // When the user clicks the button, open the modal 
+      openingElement.click(function () {
+        modal.css('display', 'block');
+      });
+
+      // When the user clicks on <span> (x), close the modal
+      modal.on('click','.custom-modal-close', function() {
+        modal.css('display', 'none');
+      });
+
+      // When the user clicks anywhere outside of the modal, close it
+      if (!staticWrapper)
+        window.onclick = function (event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
     },
   },
   api: {
@@ -733,7 +758,7 @@ fileUploadsListView = {
       var checkbox = /*html*/ `
       <div class="form-check">
       <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" value="" ${checkedStatus} data-id="${row.id}" data-index="${i-1}">
+        <input class="form-check-input" type="checkbox" value="" ${checkedStatus} data-id="${row.id}" data-index="${i - 1}">
         <span class="form-check-sign">
           <span class="check"></span>
         </span>
@@ -752,10 +777,10 @@ fileUploadsListView = {
 
   },
 
-  buildForm:function (index) {
+  buildForm: function (index) {
 
     var jsonObj = fileUploadsListView.selectedFileJsonData[index];
-    var form = '<form>';
+    var form = '<form><div class="row">';
 
     this.columnMaps.forEach(function (obj) {
       var typeSelectFields = ['is_publication_mandatory_phd_requirement', 'is_publication_outcome_of_shodh_pravartan_or_irg', 'is_authorship_affiliated_to_kjc'];
@@ -766,32 +791,33 @@ fileUploadsListView = {
         <option>no</option>`: `<option>yes</option>
         <option selected>no</option>`;
 
-        form += `
+        form += `<div class="col-lg-4 col-md-6 col-xl-4 mb-1">
         <div class="form-group">
         <label for="${obj.columnName}">${obj.mappedName}</label>
         <select class="form-control" id="${obj.columnName}">
           ${options}
         </select>
       </div>
+      </div>
         `;
 
       } else {
         var inputType = obj.columnName === 'year' ? 'number' : 'text';
 
-        form += `<div class="form-group">
+        form += `<div class="col-lg-4 col-md-6 col-xl-4 mb-1"><div class="form-group">
       <label for="${obj.columnName}">${obj.mappedName}</label>
       <input type="${inputType}" class="form-control" value="${jsonObj[obj.columnName]}" id="${obj.columnName}" aria-describedby="${obj.columnName}Help" placeholder="Enter ${obj.mappedName}" required maxlength="${obj.dataLength}">
-      <small id="${obj.columnName}Help" class="form-text text-muted">Max ${obj.dataLength} characters allowed.</small>
-    </div>`;
+      <small id="${obj.columnName}Help" class="form-text text-warning">Max ${obj.dataLength} characters allowed.</small>
+    </div></div>`;
       }
 
 
     });
 
-    form +='<button class="btn btn-warning" id="closeEditFormBtn">Cancel</button>';
-    form += '<button type="submit" class="btn btn-primary float-right">Update</button>';
+    form += '<div class="col-12"><button type = "button" class="btn btn-warning custom-modal-close">Cancel</button>';
+    form += '<button type="submit" class="btn btn-primary float-right">Update</button></div>';
 
-    form = form + '</form';
+    form = form + '</div><br><br></form';
 
     return form;
 
@@ -983,22 +1009,14 @@ fileUploadsListView = {
 
     //row edit button listener
     $('#editRowButton').on('click', (e) => {
-
-      $('#detailsView').addClass('hidden');
-      var formContainer = $('#editFormContainer');
-      utilities.showNotification('top', 'center', type.info, '<strong>Multiple rows selected!</strong> Choosing the first selected.', 3000);
-      formContainer.find('.card-title').html('Update Details');
-      formContainer.removeClass('hidden');
       $('#displayForm').html(fileUploadsListView.buildForm(fileUploadsListView.checkedList[0].index));
-      utilities.functions.scrollToTop();
+      var formContainer = $('#customModal');
+      if (fileUploadsListView.checkedList.length > 1)
+        utilities.showNotification('top', 'center', type.info, '<strong>Multiple rows selected!</strong> Choosing the first selected.', 3000);
+      formContainer.find('.card-title').html('Update Details');
     });
 
-    $('#editFormContainer').on('click','#closeEditFormBtn',function(e) {
-      $('#editFormContainer').addClass('hidden');
-      $('#displayForm').empty();
-      $('#detailsView').removeClass('hidden');
-      utilities.functions.scrollToTop();
-    });
+    utilities.functions.addCustomModalListener('#editRowButton');
 
     //row verify button listener
     $('#reVerifyRowButton').on('click', function () {
