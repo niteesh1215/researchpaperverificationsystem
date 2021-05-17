@@ -142,6 +142,23 @@ public class MainController {
 		}
 	}
 
+	@PostMapping(path ="/update-row")
+	public @ResponseBody HashMap<String, String> updateRow(@RequestBody Map<String, Object> editedRow){
+		HashMap<String, String> map = new HashMap<>();
+		try{
+			researchDetailsRepositoryService.updateResearchDetailsRow(editedRow, columnMapRepositoryService.getAllMapping());
+			map.put("status", "success");
+			map.put("message", "Successfuly deleted");
+			return map;
+		}	catch (Exception e) {
+			System.out.println(e);
+			map.clear();
+			map.put("error", "error");
+			map.put("message", "An unknown error occurred");
+			return map;
+		}
+	}
+
 	@GetMapping(path = "/columns-mapping")
 	public @ResponseBody Iterable<ColumnMap> columnsMapping() {
 		return columnMapRepositoryService.getAllMapping();
