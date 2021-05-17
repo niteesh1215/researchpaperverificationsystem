@@ -194,28 +194,31 @@ utilities = {
       console.log('scrolling to top');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-
-    addCustomModalListener: function (modelOpeningElementSelector, staticWrapper = true) {
-      var modal = $('#customModal');
+  },
+  customModal: {
+    modal: $('#customModal'),
+    openModal: function () {
+      utilities.customModal.modal.css('display', 'block');
+    },
+    closeModal: function () {
+      utilities.customModal.modal.css('display', 'none');
+    },
+    addListeners: function (modelOpeningElementSelector, staticWrapper = true) {
 
       // Get the button that opens the modal
       var openingElement = $(modelOpeningElementSelector);
 
       // When the user clicks the button, open the modal 
-      openingElement.click(function () {
-        modal.css('display', 'block');
-      });
+      openingElement.click(utilities.customModal.openModal);
 
       // When the user clicks on <span> (x), close the modal
-      modal.on('click','.custom-modal-close', function() {
-        modal.css('display', 'none');
-      });
+      utilities.customModal.modal.on('click', '.custom-modal-close', utilities.customModal.closeModal);
 
       // When the user clicks anywhere outside of the modal, close it
       if (!staticWrapper)
         window.onclick = function (event) {
           if (event.target == modal) {
-            modal.style.display = "none";
+            utilities.customModal.closeModal();
           }
         }
     },
@@ -753,12 +756,18 @@ fileUploadsListView = {
 
     jsonData.forEach((row) => {
 
-      var checkedStatus = fileUploadsListView.checkedList.includes(`${row.id}`) ? "checked" : "";
+      var checkedStatus = '';
+      for (obj of fileUploadsListView.checkedList) {
+        if (obj.id == row.id.toString()) {
+          checkedStatus = "checked";
+          break;
+        }
+      }
 
-      var checkbox = /*html*/ `
+      var checkbox = `
       <div class="form-check">
       <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" value="" ${checkedStatus} data-id="${row.id}" data-index="${i - 1}">
+        <input class="form-check-input" type="checkbox" ${checkedStatus} data-id="${row.id}" data-index="${i - 1}">
         <span class="form-check-sign">
           <span class="check"></span>
         </span>
@@ -794,7 +803,7 @@ fileUploadsListView = {
         form += `<div class="col-lg-4 col-md-6 col-xl-4 mb-1">
         <div class="form-group">
         <label for="${obj.columnName}">${obj.mappedName}</label>
-        <select class="form-control" id="${obj.columnName}">
+        <select class="form-control" id="${obj.columnName}" name="${obj.columnName}">
           ${options}
         </select>
       </div>
@@ -806,13 +815,28 @@ fileUploadsListView = {
 
         form += `<div class="col-lg-4 col-md-6 col-xl-4 mb-1"><div class="form-group">
       <label for="${obj.columnName}">${obj.mappedName}</label>
-      <input type="${inputType}" class="form-control" value="${jsonObj[obj.columnName]}" id="${obj.columnName}" aria-describedby="${obj.columnName}Help" placeholder="Enter ${obj.mappedName}" required maxlength="${obj.dataLength}">
+      <input type="${inputType}" class="form-control" name="${obj.columnName}" value="${jsonObj[obj.columnName]}" id="${obj.columnName}" aria-describedby="${obj.columnName}Help" placeholder="Enter ${obj.mappedName}" required maxlength="${obj.dataLength}">
       <small id="${obj.columnName}Help" class="form-text text-warning">Max ${obj.dataLength} characters allowed.</small>
     </div></div>`;
       }
-
-
     });
+
+    var verificationOptions = "";
+    var verificationStatuses = ["found", "not_found", "partial_match", "not_verified"];
+
+    verificationStatuses.forEach(function (status) {
+      var selectedStatus = status == jsonObj.verification_status ? 'selected' : '';
+      verificationOptions += `<option value="${status}" ${selectedStatus}>${status}</option>`;
+    });
+
+    form += `<div class="col-lg-4 col-md-6 col-xl-4 mb-1">
+    <div class="form-group">
+    <label for="verification_status">Verification Status</label>
+    <select class="form-control" id="verification_status" name="verification_status">
+      ${verificationOptions}
+    </select>
+  </div>
+  </div>`;
 
     form += '<div class="col-12"><button type = "button" class="btn btn-warning custom-modal-close">Cancel</button>';
     form += '<button type="submit" class="btn btn-primary float-right">Update</button></div>';
@@ -1016,7 +1040,43 @@ fileUploadsListView = {
       formContainer.find('.card-title').html('Update Details');
     });
 
-    utilities.functions.addCustomModalListener('#editRowButton');
+    utilities.customModal.addListeners('#editRowButton');
+
+    $('#displayForm').on('submit', 'form', function (e) {
+      e.preventDefault();
+
+      utilities.customModal.closeModal();
+      var editedRowDetails = $(this).serializeArray().reduce(function (obj, item) {
+        obj[item.name] = item.value;
+        return obj;
+      }, {});
+
+      editedRowDetails['id'] = fileUploadsListView.checkedList[0].id;
+
+      utilities.showNotification('top', 'center', type.info, '<strong>Updating row!</strong> Please wait....');
+
+      $.ajax({
+        type: "post",
+        contentType: "application/json",
+        url: '/update-row',
+        dataType: 'json',
+        data: JSON.stringify(editedRowDetails),
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+          if (data.status === 'success') {
+            fileUploadsListView.fetchResearchDetailsAndBuildUI();
+            utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Row updated successfully.');
+
+          } else
+            utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to update the row.');
+
+        },
+        error: function (e) {
+          utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to update the row.');
+        }
+      });
+    });
 
     //row verify button listener
     $('#reVerifyRowButton').on('click', function () {
