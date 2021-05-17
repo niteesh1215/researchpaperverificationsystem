@@ -6,6 +6,7 @@ import com.kristujayanticollege.researchpaperverificationsystem.projectenums.Ver
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +26,10 @@ public class ResearchDetailsRepositoryService {
     private JdbcTemplate jdbcTemplate;
 
     public void addResearchDetailsRow(JSONObject row) {
-        
+
     }
 
-    private String createQuery(List<ColumnMap> columnMaps) {
+    private String createInsertQuery(List<ColumnMap> columnMaps) {
         String query = "insert into `research_details`(`group_id`,";
         String values = "values(?,";
         for (ColumnMap columnMap : columnMaps) {
@@ -44,7 +46,7 @@ public class ResearchDetailsRepositoryService {
     public Boolean addReseachDetails(JSONArray researchDetails, Long uploadId, List<ColumnMap> columnMaps) {
 
         final int batchSize = 500;
-        String insertQuery = createQuery(columnMaps);
+        String insertQuery = createInsertQuery(columnMaps);
 
         for (int j = 0; j < researchDetails.size(); j += batchSize) {
 
@@ -82,6 +84,43 @@ public class ResearchDetailsRepositoryService {
 
     }
 
+    private String createUpdateQuery(List<ColumnMap> columnMaps) {
+        String query = "UPDATE `research_details` SET";
+        for (ColumnMap columnMap : columnMaps) {
+            query += " " + columnMap.getColumnName() + " = ? ,";
+        }
+
+        query += " verification_status = ?";
+
+        query += " WHERE `id` = ?";
+
+        return query;
+    }
+
+    @Transactional
+    public boolean updateResearchDetailsRow(Map<String, Object> row, List<ColumnMap> columnMaps) {
+        final String query = createUpdateQuery(columnMaps);
+
+        jdbcTemplate.update(query, new PreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps) throws SQLException {
+                int i = 1;
+                for (ColumnMap columnMap : columnMaps) {
+                    if (columnMap.getColumnName() == "year")
+                        ps.setInt(i, (Integer) row.get(columnMap.getColumnName()));
+                    else
+                        ps.setString(i, String.valueOf(row.get(columnMap.getColumnName().toLowerCase())).trim());
+
+                    i++;
+                }
+
+                ps.setString(i++, (String) row.get("verification_status"));
+                ps.setLong(i, Long.parseLong((String)row.get("id")));
+            }
+        });
+        return true;
+    }
+
     public List<Map<String, Object>> getResearchDetailsByGroupId(Long groupId) {
 
         String sql = "SELECT * FROM `research_details` WHERE `group_id` = ?";
@@ -91,26 +130,25 @@ public class ResearchDetailsRepositoryService {
         return rows;
     }
 
-    public Map<String, Object> getResearchDetailsById(Long id){
+    public Map<String, Object> getResearchDetailsById(Long id) {
         String sql = "SELECT * FROM `research_details` WHERE `id` = ?";
-        
+
         Map<String, Object> row = jdbcTemplate.queryForMap(sql, new Object[] { id });
 
         return row;
     }
 
     @Transactional
-    public boolean deleteResearchDetailsById(Long id){
+    public boolean deleteResearchDetailsById(Long id) {
         String sql = "DELETE FROM `research_details` WHERE `id` = ?";
-        return jdbcTemplate.update(sql,id) == 1;
+        return jdbcTemplate.update(sql, id) == 1;
     }
- 
-    @Transactional 
-    public void updateVerificationStatus(Long researchDetailsRowId, VerificationStatus status){
+
+    @Transactional
+    public void updateVerificationStatus(Long researchDetailsRowId, VerificationStatus status) {
         String sql = "UPDATE `research_details` SET `verification_status`= ? , `verification_timestamp` = NOW() WHERE `id`= ?";
         String verificationStatusValue = RPVSEnums.getVerificationStatusEnumValue(status);
-        jdbcTemplate.update(sql, verificationStatusValue,researchDetailsRowId);
-    } 
+        jdbcTemplate.update(sql, verificationStatusValue, researchDetailsRowId);
+    }
 
-    
 }
