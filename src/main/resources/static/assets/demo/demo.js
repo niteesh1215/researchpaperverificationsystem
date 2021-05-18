@@ -194,7 +194,23 @@ utilities = {
       console.log('scrolling to top');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
+    addTableSearchListener: function (inputSelector ='#search', tableSelector='table tr') {
+      $(inputSelector).keyup(function () {
+        var value = this.value.toLowerCase().trim();
+        console.log(tableSelector);
+        $(tableSelector).each(function (index) {
+          if (!index) return;
+          $(this).find("td").each(function () {
+            var id = $(this).text().toLowerCase().trim();
+            var not_found = (id.indexOf(value) == -1);
+            $(this).closest('tr').toggle(!not_found);
+            return not_found;
+          });
+        });
+      });
+    }
   },
+
   customModal: {
     modal: $('#customModal'),
     openModal: function () {
@@ -235,8 +251,6 @@ utilities = {
             resolve(data);
           },
           error: function (e) {
-
-            console.log(e);
             reject(e);
           }
         });
@@ -786,9 +800,12 @@ fileUploadsListView = {
 
   },
 
-  buildForm: function (index) {
+  buildForm: function (index = -1) {
 
-    var jsonObj = fileUploadsListView.selectedFileJsonData[index];
+    var jsonObj;
+    if (index != -1)
+      jsonObj = fileUploadsListView.selectedFileJsonData[index];
+
     var form = '<form><div class="row">';
 
     this.columnMaps.forEach(function (obj) {
@@ -796,9 +813,14 @@ fileUploadsListView = {
 
 
       if (typeSelectFields.includes(obj.columnName)) {
-        var options = jsonObj[obj.columnName].trim().toLowerCase() == 'yes' ? `<option selected>yes</option>
+
+        var options = '';
+        if (index != -1)
+          options = jsonObj[obj.columnName].trim().toLowerCase() == 'yes' ? `<option selected>yes</option>
         <option>no</option>`: `<option>yes</option>
         <option selected>no</option>`;
+        else
+          options = '<option>yes</option><option>no</option>';
 
         form += `<div class="col-lg-4 col-md-6 col-xl-4 mb-1">
         <div class="form-group">
@@ -810,22 +832,56 @@ fileUploadsListView = {
       </div>
         `;
 
+      } else if (obj.columnName == 'indexing') {
+        var indexings = ['Scopus', 'UGC CARE', 'Web of Science', 'Refereed / Peer Reviewed'];
+        var indexingOptions = '';
+
+        indexings.forEach(function (indexing) {
+
+          var selectedIndexing = '';
+          if (index != -1)
+            selectedIndexing = indexing == jsonObj.indexing ? 'selected' : '';
+          indexingOptions += `<option value="${indexing}" ${selectedIndexing}>${indexing}</option>`;
+        });
+
+        form += `<div class="col-lg-4 col-md-6 col-xl-4 mb-1">
+        <div class="form-group">
+        <label for="${obj.columnName}">${obj.mappedName}</label>
+        <select class="form-control" id="${obj.columnName}" name="${obj.columnName}">
+          ${indexingOptions}
+        </select>
+      </div>
+      </div>
+        `;
+
       } else {
         var inputType = obj.columnName === 'year' ? 'number' : 'text';
 
+        var value = '';
+        if (index != -1)
+          value = jsonObj[obj.columnName];
+
+        var dateFormatInstructions = ''
+        if (obj.columnName == 'date') {
+          dateFormatInstructions = ' (dd/mm/yyyy)';
+        }
+
         form += `<div class="col-lg-4 col-md-6 col-xl-4 mb-1"><div class="form-group">
-      <label for="${obj.columnName}">${obj.mappedName}</label>
-      <input type="${inputType}" class="form-control" name="${obj.columnName}" value="${jsonObj[obj.columnName]}" id="${obj.columnName}" aria-describedby="${obj.columnName}Help" placeholder="Enter ${obj.mappedName}" required maxlength="${obj.dataLength}">
+      <label for="${obj.columnName}">${obj.mappedName} ${dateFormatInstructions}</label>
+      <input type="${inputType}" class="form-control" name="${obj.columnName}" value="${value}" id="${obj.columnName}" aria-describedby="${obj.columnName}Help" placeholder="Enter ${obj.mappedName}" required maxlength="${obj.dataLength}">
       <small id="${obj.columnName}Help" class="form-text text-warning">Max ${obj.dataLength} characters allowed.</small>
     </div></div>`;
       }
     });
 
     var verificationOptions = "";
-    var verificationStatuses = ["found", "not_found", "partial_match", "not_verified"];
+    var verificationStatuses = ["not_verified", "found", "not_found", "partial_match"];
 
     verificationStatuses.forEach(function (status) {
-      var selectedStatus = status == jsonObj.verification_status ? 'selected' : '';
+
+      var selectedStatus = '';
+      if (index != -1)
+        selectedStatus = status == jsonObj.verification_status ? 'selected' : '';
       verificationOptions += `<option value="${status}" ${selectedStatus}>${status}</option>`;
     });
 
@@ -849,6 +905,16 @@ fileUploadsListView = {
 
   addEventListeners: function () {
 
+    //search textbox listener
+    utilities.functions.addTableSearchListener('#search','#fileUploadListTable tr');
+
+    $('.selection-count').on('click','#unselectCheckboxes',function(){
+      fileUploadsListView.checkedList = [];
+      $('#detailsTableView input:checkbox').prop('checked',false);
+      $(".action-buttons, .selection-count").addClass('hidden');
+      $('#addNewRow').removeClass('hidden');
+    });
+
     //view button listener
     $('#fileUploadListTable tbody').on('click', '.view-button', function () {
       var id = $(this).attr("data-index");
@@ -858,8 +924,9 @@ fileUploadsListView = {
 
       fileUploadsListView.checkedList = [];
 
+      $('#search').unbind();
+      utilities.functions.addTableSearchListener('#search','#detailsTableView table tr');
       fileUploadsListView.fetchResearchDetailsAndBuildUI();
-
     });
 
     //deleteButton listener
@@ -889,6 +956,7 @@ fileUploadsListView = {
           cache: false,
           timeout: 600000,
           success: function (data) {
+            fileUploadsListView.getFileUploads(fileUploadsListView.buildTable);
             utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> File was deleted successfuly.');
           },
           error: function (e) {
@@ -908,6 +976,8 @@ fileUploadsListView = {
 
     //back button click listener
     $('.back-button').on('click', function () {
+      $('#search').unbind();
+      utilities.functions.addTableSearchListener('#search','#fileUploadListTable tr');
       $('#tableView').removeClass('hidden');
       $('#detailsView').addClass('hidden');
     });
@@ -956,6 +1026,7 @@ fileUploadsListView = {
     $("#detailsTableView").on('change', 'input[type=checkbox]', (e) => {
 
       if (this.checkedList.length === 0) {
+        $('#addNewRow').addClass('hidden');
         $(".action-buttons, .selection-count").removeClass('hidden');
       }
       var id = $(e.target).attr('data-id');
@@ -969,11 +1040,26 @@ fileUploadsListView = {
       else
         this.checkedList = this.checkedList.filter(item => item.id !== id);
 
-      if (this.checkedList.length === 0)
+      if (this.checkedList.length === 0) {
         $(".action-buttons, .selection-count").addClass('hidden');
+        $('#addNewRow').removeClass('hidden');
+      }
       else
-        $(".selection-count").html(`Total <span class="text-danger">${this.checkedList.length}</span> row(s) selected.`);
+        $(".selection-count").html(`Total <span class="text-danger">${this.checkedList.length}</span> row(s) selected.  <button class="btn btn-warning btn-sm ml-1" id="unselectCheckboxes">UNSELECT ALL</button>`);
     });
+
+
+    //add new row 
+
+    $('#addNewRow').on('click', function () {
+
+      $('#displayForm').html(fileUploadsListView.buildForm());
+      var formContainer = $('#customModal');
+      formContainer.find('.card-title').html('Add New Row');
+
+    });
+
+    utilities.customModal.addListeners('#addNewRow');
 
     //row delete button listener
     $('#deleteRowButton').on('click', (e) => {
@@ -1012,6 +1098,8 @@ fileUploadsListView = {
               -Rebuild the ui, with updated data
             */
             $(".selection-count,.action-buttons").addClass('hidden');
+            $('#addNewRow').removeClass('hidden');
+
             fileUploadsListView.checkedList = [];
             fileUploadsListView.fetchResearchDetailsAndBuildUI();
             utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Row(s) deleted successfuly.');
@@ -1038,42 +1126,62 @@ fileUploadsListView = {
       if (fileUploadsListView.checkedList.length > 1)
         utilities.showNotification('top', 'center', type.info, '<strong>Multiple rows selected!</strong> Choosing the first selected.', 3000);
       formContainer.find('.card-title').html('Update Details');
+
     });
 
     utilities.customModal.addListeners('#editRowButton');
 
+
+
+    //edit row or add new row form
     $('#displayForm').on('submit', 'form', function (e) {
       e.preventDefault();
 
       utilities.customModal.closeModal();
-      var editedRowDetails = $(this).serializeArray().reduce(function (obj, item) {
+      var rowDetails = $(this).serializeArray().reduce(function (obj, item) {
         obj[item.name] = item.value;
         return obj;
       }, {});
 
-      editedRowDetails['id'] = fileUploadsListView.checkedList[0].id;
+      var action = '';
+      var initializeMessage = '';
+      var successMessage = '';
+      var failureMessage = '';
+      if (fileUploadsListView.checkedList.length > 0) {
+        rowDetails['id'] = fileUploadsListView.checkedList[0].id;
+        action = '/update-row';
+        initializeMessage = 'Updating row!';
+        successMessage = 'Row updated';
+        failureMessage = 'update';
+      }
+      else {
+        rowDetails['group_id'] = fileUploadsListView.selectedFileId;
+        action = '/add-new-row';
+        initializeMessage = 'Adding row!';
+        successMessage = 'Row added';
+        failureMessage = 'add';
+      }
 
-      utilities.showNotification('top', 'center', type.info, '<strong>Updating row!</strong> Please wait....');
+
+      utilities.showNotification('top', 'center', type.info, `<strong>${initializeMessage}</strong> Please wait....`);
 
       $.ajax({
         type: "post",
         contentType: "application/json",
-        url: '/update-row',
+        url: action,
         dataType: 'json',
-        data: JSON.stringify(editedRowDetails),
+        data: JSON.stringify(rowDetails),
         cache: false,
         timeout: 600000,
         success: function (data) {
           if (data.status === 'success') {
             fileUploadsListView.fetchResearchDetailsAndBuildUI();
-            utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Row updated successfully.');
-
+            utilities.showNotification('top', 'center', type.success, `<strong>Success!</strong> ${successMessage} successfully.`);
           } else
-            utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to update the row.');
-
+            utilities.showNotification('top', 'center', type.danger, `<strong>Failed!</strong> Failed to ${failureMessage} the row.`);
         },
         error: function (e) {
-          utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to update the row.');
+          utilities.showNotification('top', 'center', type.danger, `<strong>Failed!</strong> Failed to ${failureMessage} the row.`);
         }
       });
     });
