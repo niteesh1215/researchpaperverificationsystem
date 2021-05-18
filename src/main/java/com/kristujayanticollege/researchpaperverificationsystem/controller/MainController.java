@@ -84,11 +84,11 @@ public class MainController {
 	}
 
 	@PostMapping(path = "/save")
-	public ResponseEntity<HashMap<String, String>> save(@RequestBody String json) {
+	public ResponseEntity<HashMap<String, String>> save(@RequestBody Map<String, Object> researchDetailsRows) {
 		HashMap<String, String> map = new HashMap<>();
 		try {
 			TransactionalService ts = new TransactionalService();
-			ts.addRsearchDetails(json, uploadRepositoryService, researchDetailsRepositoryService,
+			ts.addRsearchDetails(researchDetailsRows, uploadRepositoryService, researchDetailsRepositoryService,
 					columnMapRepositoryService);
 			map.put("status", "success");
 			map.put("message", "Successfuly added");
@@ -113,6 +113,24 @@ public class MainController {
 		} catch (Exception e) {
 			System.out.println(e);
 			return new ArrayList<Map<String, Object>>();
+		}
+	}
+
+	@PostMapping(path = "/add-new-row")
+	public @ResponseBody HashMap<String, String> addNewRow(@RequestBody Map<String, Object> newRow) {
+		HashMap<String, String> map = new HashMap<>();
+		try {
+			researchDetailsRepositoryService.addNewResearchDetailsRow(newRow,
+					columnMapRepositoryService.getAllMapping());
+			map.put("status", "success");
+			map.put("message", "Successfuly deleted");
+			return map;
+		} catch (Exception e) {
+			System.out.println(e);
+			map.clear();
+			map.put("error", "error");
+			map.put("message", "An unknown error occurred");
+			return map;
 		}
 	}
 
@@ -142,15 +160,16 @@ public class MainController {
 		}
 	}
 
-	@PostMapping(path ="/update-row")
-	public @ResponseBody HashMap<String, String> updateRow(@RequestBody Map<String, Object> editedRow){
+	@PostMapping(path = "/update-row")
+	public @ResponseBody HashMap<String, String> updateRow(@RequestBody Map<String, Object> editedRow) {
 		HashMap<String, String> map = new HashMap<>();
-		try{
-			researchDetailsRepositoryService.updateResearchDetailsRow(editedRow, columnMapRepositoryService.getAllMapping());
+		try {
+			researchDetailsRepositoryService.updateResearchDetailsRow(editedRow,
+					columnMapRepositoryService.getAllMapping());
 			map.put("status", "success");
 			map.put("message", "Successfuly deleted");
 			return map;
-		}	catch (Exception e) {
+		} catch (Exception e) {
 			System.out.println(e);
 			map.clear();
 			map.put("error", "error");
