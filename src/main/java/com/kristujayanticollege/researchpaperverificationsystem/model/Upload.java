@@ -53,9 +53,8 @@ public class Upload {
 
     @JsonProperty("date") 
     public String getFormattedDate() {
-        Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-        return formatter.format(date);
+        return formatter.format(this.date);
     }
 
     public void setDate(Date date) {
