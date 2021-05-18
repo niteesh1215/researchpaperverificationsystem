@@ -6,13 +6,12 @@ import com.kristujayanticollege.researchpaperverificationsystem.projectenums.Ver
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 
 import javax.transaction.Transactional;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,10 +23,6 @@ import org.springframework.stereotype.Service;
 public class ResearchDetailsRepositoryService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    public void addResearchDetailsRow(JSONObject row) {
-
-    }
 
     private String createInsertQuery(List<ColumnMap> columnMaps) {
         String query = "insert into `research_details`(`group_id`,";
@@ -43,22 +38,22 @@ public class ResearchDetailsRepositoryService {
     }
 
     @Transactional
-    public Boolean addReseachDetails(JSONArray researchDetails, Long uploadId, List<ColumnMap> columnMaps) {
+    public Boolean addReseachDetails(List<Map<String, Object>> researchDetailsRows, Long uploadId,
+            List<ColumnMap> columnMaps) {
 
         final int batchSize = 500;
         String insertQuery = createInsertQuery(columnMaps);
 
-        for (int j = 0; j < researchDetails.size(); j += batchSize) {
+        for (int j = 0; j < researchDetailsRows.size(); j += batchSize) {
 
-            @SuppressWarnings("unchecked")
-            final List<JSONObject> rowArray = researchDetails.subList(j,
-                    j + batchSize > researchDetails.size() ? researchDetails.size() : j + batchSize);
+            final List<Map<String, Object>> rowArray = researchDetailsRows.subList(j,
+                    j + batchSize > researchDetailsRows.size() ? researchDetailsRows.size() : j + batchSize);
 
             jdbcTemplate.batchUpdate(insertQuery, new BatchPreparedStatementSetter() {
 
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    JSONObject row = (JSONObject) rowArray.get(i);
+                    Map<String, Object> row = rowArray.get(i);
 
                     ps.setLong(1, uploadId);
                     int j = 2;
@@ -80,6 +75,30 @@ public class ResearchDetailsRepositoryService {
             });
 
         }
+        return true;
+
+    }
+
+    @Transactional
+    public boolean addNewResearchDetailsRow(Map<String, Object> row, List<ColumnMap> columnMaps) {
+        String query = createInsertQuery(columnMaps);
+
+        jdbcTemplate.update(query, new PreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps) throws SQLException {
+
+                ps.setLong(1, Long.parseLong((String) row.get("group_id")));
+                int i = 2;
+                for (ColumnMap columnMap : columnMaps) {
+                    if (columnMap.getColumnName() == "year")
+                        ps.setInt(i, (Integer) row.get(columnMap.getColumnName()));
+                    else
+                        ps.setString(i, String.valueOf(row.get(columnMap.getColumnName().toLowerCase())).trim());
+
+                    i++;
+                }
+            }
+        });
         return true;
 
     }
@@ -115,7 +134,7 @@ public class ResearchDetailsRepositoryService {
                 }
 
                 ps.setString(i++, (String) row.get("verification_status"));
-                ps.setLong(i, Long.parseLong((String)row.get("id")));
+                ps.setLong(i, Long.parseLong((String) row.get("id")));
             }
         });
         return true;
