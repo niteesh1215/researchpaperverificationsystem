@@ -147,12 +147,13 @@
             <div class="modal modal-search fade" id="searchModal" tabindex="-1" role="dialog"
                 aria-labelledby="searchModal" aria-hidden="true">
                 <div class="modal-dialog" role="document">
-                    <div class="modal-content">
+                    <div class="modal-content ">
                         <div class="modal-header">
-                            <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="SEARCH">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <input type="text" class="form-control" id="search" placeholder="SEARCH">
+                            <button type="button" class="close text-danger" data-dismiss="modal" aria-label="Close">
                                 <i class="tim-icons icon-simple-remove"></i>
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -177,6 +178,7 @@
                     </div>
                 </div>
             </div>
+
             <!--main content-->
             <div class="content">
                 <div class="row" id="tableView">
@@ -311,12 +313,23 @@
                             <div class="card table-card p-2">
                                 <div class="card-header">
                                     <div class="row">
-                                        <div class="col-lg-8 col-xl-8 col-7">
+                                        <div class="col-lg-8 col-xl-8 ">
                                             <h4 class="card-title d-none d-md-block d-lg-block d-xl-block"></h4>
-                                            <h6 class="card-title d-block d-md-none d-lg-none d-xl-none"></h6>
+                                            <h5 class="card-title d-block d-md-none d-lg-none d-xl-none"></h5>
                                             <h6 class="text-info mt-2"> Shift + Scroll to scroll horizontally</h6>
                                         </div>
-                                        <div class="col-lg-4 col-xl-4 col-5">
+                                        <div class="col-lg-4 col-xl-4">
+                                            <button
+                                                class="btn animation-on-hover btn-fab btn-icon btn-round float-right border border-primary border2px"
+                                                id="addNewRow" title="add new row">
+                                                <i class="tim-icons icon-simple-add"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-primary animation-on-hover btn-fab btn-icon btn-round float-right border border-white border2px mr-1"
+                                                id="searchBtn" title="search" data-toggle="modal"
+                                                data-target="#searchModal">
+                                                <i class="tim-icons icon-zoom-split"></i>
+                                            </button>
                                             <div class="action-buttons hidden">
                                                 <button
                                                     class="btn btn-danger animation-on-hover btn-fab btn-icon btn-round float-right mr-1"
@@ -342,7 +355,7 @@
                                         </div>
                                     </div>
 
-                                    
+
                                 </div>
                                 <div class="card-body">
                                     <h4 class="selection-count hidden mb-2 text-center"></h4>
