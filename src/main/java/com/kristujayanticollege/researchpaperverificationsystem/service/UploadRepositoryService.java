@@ -12,13 +12,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UploadRepositoryService {
     @Autowired
     private UploadRepository uploadRepository;
 
-    public Upload save(JSONObject uploadDetails) throws ParseException {
+    public Upload save(Map<String,Object> uploadDetails) throws ParseException {
         Upload upload = new Upload();
 
         upload.setFileName((String) uploadDetails.get("filename"));
