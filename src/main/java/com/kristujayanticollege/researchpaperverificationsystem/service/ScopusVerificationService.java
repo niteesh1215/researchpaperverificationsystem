@@ -250,7 +250,7 @@ public class ScopusVerificationService {
             verificationDetails.setIssnMatch(issnMatch);
             verificationDetails.setFetchedIssn(matchedEntry.getIssn());
 
-            verificationDetails.setVerificationMatchPercentage(verificationScore / 5);
+            verificationDetails.setVerificationMatchPercentage(verificationScore / 5); // divide by 5 because checked for 5 fields
 
             if (fullNameMatch && manuscriptTitleMatch && journalTitleMatch && volumeNumberMatch) {
                 status = VerificationStatus.FOUND;
