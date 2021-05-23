@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import com.kristujayanticollege.researchpaperverificationsystem.model.Upload;
 import com.kristujayanticollege.researchpaperverificationsystem.repository.UploadRepository;
 
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
