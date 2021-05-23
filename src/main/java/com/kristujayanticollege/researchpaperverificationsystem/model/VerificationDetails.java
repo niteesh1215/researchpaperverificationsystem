@@ -1,8 +1,13 @@
 package com.kristujayanticollege.researchpaperverificationsystem.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class VerificationDetails {
@@ -27,15 +32,21 @@ public class VerificationDetails {
 
     double verificationMatchPercentage;
 
-    public VerificationDetails(){
-        fullNameMatch=false;
-        manuscriptTitleMatch=false;
-        journalTitleMatch=false;
-        volumeNumberMatch=false;
-        issnMatch=false;
+    @Column(name = "found_url_1")
+    String foundUrl1;
+    @Column(name = "found_url_2")
+    String foundUrl2;
+
+    public VerificationDetails() {
+        fullNameMatch = false;
+        manuscriptTitleMatch = false;
+        journalTitleMatch = false;
+        volumeNumberMatch = false;
+        issnMatch = false;
         verificationMatchPercentage = 0.0;
     }
 
+    @JsonProperty("id")
     public Long getResearchDetailsRowId() {
         return researchDetailsRowId;
     }
@@ -44,6 +55,7 @@ public class VerificationDetails {
         this.researchDetailsRowId = researchDetailsRowId;
     }
 
+    @JsonProperty("fullNameMatch")
     public boolean isFullNameMatch() {
         return fullNameMatch;
     }
@@ -52,6 +64,7 @@ public class VerificationDetails {
         this.fullNameMatch = fullNameMatch;
     }
 
+    @JsonProperty("fullName")
     public String getFetchedFullName() {
         return fetchedFullName;
     }
@@ -60,6 +73,7 @@ public class VerificationDetails {
         this.fetchedFullName = fetchedFullName;
     }
 
+    @JsonProperty("manuscriptTitleMatch")
     public boolean isManuscriptTitleMatch() {
         return manuscriptTitleMatch;
     }
@@ -68,6 +82,7 @@ public class VerificationDetails {
         this.manuscriptTitleMatch = manuscriptTitleMatch;
     }
 
+    @JsonProperty("manuscriptTitle")
     public String getFetchedManuscriptTitle() {
         return fetchedManuscriptTitle;
     }
@@ -76,6 +91,7 @@ public class VerificationDetails {
         this.fetchedManuscriptTitle = fetchedManuscriptTitle;
     }
 
+    @JsonProperty("journalTitleMatch")
     public boolean isJournalTitleMatch() {
         return journalTitleMatch;
     }
@@ -84,6 +100,7 @@ public class VerificationDetails {
         this.journalTitleMatch = journalTitleMatch;
     }
 
+    @JsonProperty("journalTitle")
     public String getFetchedJournalTitle() {
         return fetchedJournalTitle;
     }
@@ -92,6 +109,7 @@ public class VerificationDetails {
         this.fetchedJournalTitle = fetchedJournalTitle;
     }
 
+    @JsonProperty("volumeNumberMatch")
     public boolean isVolumeNumberMatch() {
         return volumeNumberMatch;
     }
@@ -100,6 +118,7 @@ public class VerificationDetails {
         this.volumeNumberMatch = volumeNumberMatch;
     }
 
+    @JsonProperty("volumeNumber")
     public String getFetchedVolumeNumber() {
         return fetchedVolumeNumber;
     }
@@ -108,6 +127,7 @@ public class VerificationDetails {
         this.fetchedVolumeNumber = fetchedVolumeNumber;
     }
 
+    @JsonProperty("issnMatch")
     public boolean isIssnMatch() {
         return issnMatch;
     }
@@ -116,6 +136,7 @@ public class VerificationDetails {
         this.issnMatch = issnMatch;
     }
 
+    @JsonProperty("issn")
     public String getFetchedIssn() {
         return fetchedIssn;
     }
@@ -124,6 +145,7 @@ public class VerificationDetails {
         this.fetchedIssn = fetchedIssn;
     }
 
+    @JsonProperty("verificationMatchPercentage")
     public double getVerificationMatchPercentage() {
         return verificationMatchPercentage;
     }
@@ -132,15 +154,32 @@ public class VerificationDetails {
         this.verificationMatchPercentage = verificationMatchPercentage;
     }
 
+    @JsonProperty("foundAtUrls")
+    public List<String> getFoundAtUrls() {
+        List<String> foundUrls = new ArrayList<String>();
+        foundUrls.add(this.foundUrl1);
+        foundUrls.add(this.foundUrl2);
+
+        return foundUrls;
+    }
+
+    public void setFoundAtUrls(List<String> foundUrls) {
+        if (foundUrls.size() >= 1)
+            this.foundUrl1 = foundUrls.get(0);
+        if (foundUrls.size() >= 2)
+            this.foundUrl2 = foundUrls.get(1);
+
+    }
+
     @Override
     public String toString() {
         return "VerificationDetails [fetchedFullName=" + fetchedFullName + ", fetchedIssn=" + fetchedIssn
                 + ", fetchedJournalTitle=" + fetchedJournalTitle + ", fetchedManuscriptTitle=" + fetchedManuscriptTitle
-                + ", fetchedVolumeNumber=" + fetchedVolumeNumber + ", fullNameMatch=" + fullNameMatch 
-                + ", issnMatch=" + issnMatch + ", journalTitleMatch=" + journalTitleMatch + ", manuscriptTitleMatch="
-                + manuscriptTitleMatch + ", researchDetailsRowId=" + researchDetailsRowId
-                + ", verificationMatchPercentage=" + verificationMatchPercentage + ", volumeNumberMatch="
-                + volumeNumberMatch + "]";
+                + ", fetchedVolumeNumber=" + fetchedVolumeNumber + ", fullNameMatch=" + fullNameMatch + ", issnMatch="
+                + issnMatch + ", journalTitleMatch=" + journalTitleMatch + ", manuscriptTitleMatch="
+                + manuscriptTitleMatch + ", foundUrl1=" + foundUrl1 + ", foundUrl2=" + foundUrl2
+                + ", researchDetailsRowId=" + researchDetailsRowId + ", verificationMatchPercentage="
+                + verificationMatchPercentage + ", volumeNumberMatch=" + volumeNumberMatch + "]";
     }
 
 }
