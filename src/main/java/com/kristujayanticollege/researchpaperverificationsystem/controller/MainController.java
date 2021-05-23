@@ -13,6 +13,7 @@ import com.kristujayanticollege.researchpaperverificationsystem.model.ResearchDe
 import com.kristujayanticollege.researchpaperverificationsystem.model.Upload;
 import com.kristujayanticollege.researchpaperverificationsystem.model.VerificationDetails;
 import com.kristujayanticollege.researchpaperverificationsystem.service.ColumnMapRepositoryService;
+import com.kristujayanticollege.researchpaperverificationsystem.service.PeerReviewedVerificationService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.ResearchDetailsRepositoryService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.ScopusVerificationService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.TransactionalService;
@@ -261,24 +262,38 @@ public class MainController {
 					new TypeReference<List<ResearchDetailsRow>>() {
 					});
 
-			ScopusVerificationService service = new ScopusVerificationService();
-			service.setWebClientBuilder(webClientBuilder);
-			service.setObjectMapper(objectMapper);
+			ScopusVerificationService scopusVerificationService = new ScopusVerificationService();
+			scopusVerificationService.setWebClientBuilder(webClientBuilder);
+			scopusVerificationService.setObjectMapper(objectMapper);
+
+			PeerReviewedVerificationService peerReviewedVerificationService = new PeerReviewedVerificationService();
 
 			if (researchDetailsRows != null) {
 				for (int i = 0; i < researchDetailsRows.size(); i++) {
 
-					if (researchDetailsRows.get(i).getIndexing() != null)
-						if (researchDetailsRows.get(i).getIndexing().equalsIgnoreCase("SCOPUS")) {
-							try {
-								service.setApiKey(apiKey);
-								service.setResearchDetailsRow(researchDetailsRows.get(i));
-								service.verify();
-								service.saveStatus(verificationRepositoryService, researchDetailsRepositoryService);
-							} catch (Exception e) {
-								break;
+					try {
+						if ((researchDetailsRows.get(i).getIndexing() != null))
+							if (researchDetailsRows.get(i).getIndexing().equalsIgnoreCase("SCOPUS")) {
+
+								scopusVerificationService.setApiKey(apiKey);
+								scopusVerificationService.setResearchDetailsRow(researchDetailsRows.get(i));
+								scopusVerificationService.verify();
+								scopusVerificationService.saveStatus(verificationRepositoryService,
+										researchDetailsRepositoryService);
+
+							} else if (researchDetailsRows.get(i).getIndexing()
+									.equalsIgnoreCase("Refereed / Peer Reviewed")) {
+
+								peerReviewedVerificationService.setResearchDetailsRow(researchDetailsRows.get(i));
+								peerReviewedVerificationService.verify();
+								System.out.println(peerReviewedVerificationService.foundUrls);
+								peerReviewedVerificationService.saveStatus(verificationRepositoryService,
+										researchDetailsRepositoryService);
 							}
-						}
+
+					} catch (Exception e) {
+						System.out.println(">>>>>>>>>>>>>>>>>>>>>>" + researchDetailsRows.get(i).getId());
+					}
 				}
 
 			}
@@ -314,6 +329,8 @@ public class MainController {
 			service.setWebClientBuilder(webClientBuilder);
 			service.setObjectMapper(objectMapper);
 
+			PeerReviewedVerificationService peerReviewedVerificationService = new PeerReviewedVerificationService();
+
 			for (int i = 0; i < ids.size(); i++) {
 				Map<String, Object> researchDetails = researchDetailsRepositoryService
 						.getResearchDetailsById(ids.get(i));
@@ -328,8 +345,15 @@ public class MainController {
 						service.setResearchDetailsRow(row);
 						service.verify();
 						service.saveStatus(verificationRepositoryService, researchDetailsRepositoryService);
-					} else
-						Thread.sleep(5000);
+					} else if (row.getIndexing().equalsIgnoreCase("Refereed / Peer Reviewed")) {
+
+						peerReviewedVerificationService.setResearchDetailsRow(row);
+						peerReviewedVerificationService.verify();
+						System.out.println(peerReviewedVerificationService.foundUrls);
+						peerReviewedVerificationService.saveStatus(verificationRepositoryService,
+								researchDetailsRepositoryService);
+					}
+				Thread.sleep(5000);
 
 			}
 
