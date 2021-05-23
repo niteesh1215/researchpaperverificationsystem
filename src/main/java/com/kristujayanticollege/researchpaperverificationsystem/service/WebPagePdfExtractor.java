@@ -42,13 +42,13 @@ public class WebPagePdfExtractor {
                     map.put("pageCount", metadata.get("xmpTPg:NPages"));
                     map.put("status_code", response.getStatusLine().getStatusCode() + "");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 } finally {
                     if (input != null) {
                         try {
                             input.close();
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         }
                     }
                 }
