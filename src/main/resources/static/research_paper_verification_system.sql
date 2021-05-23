@@ -146,3 +146,37 @@ UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '5'
 UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '5' WHERE (`id` = '25');
 
 
+ALTER TABLE `research_paper_verification_system`.`verification_details` 
+ADD COLUMN `found_url_1` VARCHAR(255) NULL DEFAULT '' AFTER `verification_match_percentage`,
+ADD COLUMN `found_url_2` VARCHAR(255) NULL DEFAULT '' AFTER `found_url_1`,
+ADD COLUMN `found_url_3` VARCHAR(255) NULL DEFAULT '' AFTER `found_url_2`;
+
+
+/*
+CREATE TABLE `research_paper_verification_system`.`peer_reviewed_url` (
+  `id` INT NOT NULL,
+  `url` VARCHAR(300) NULL,
+  `verification_details_id` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `peer_reviewed_url_fk_idx` (`verification_details_id` ASC) VISIBLE,
+  CONSTRAINT `peer_reviewed_url_fk`
+    FOREIGN KEY (`verification_details_id`)
+    REFERENCES `research_paper_verification_system`.`verification_details` (`research_details_row_id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);
+    
+
+ALTER TABLE `research_paper_verification_system`.`peer_reviewed_url` 
+DROP FOREIGN KEY `peer_reviewed_url_fk`;
+ALTER TABLE `research_paper_verification_system`.`peer_reviewed_url` 
+CHANGE COLUMN `verification_details_id` `verification_details_id` INT NOT NULL ;
+ALTER TABLE `research_paper_verification_system`.`peer_reviewed_url` 
+ADD CONSTRAINT `peer_reviewed_url_fk`
+  FOREIGN KEY (`verification_details_id`)
+  REFERENCES `research_paper_verification_system`.`verification_details` (`research_details_row_id`)
+  ON DELETE CASCADE;
+  */
+  
+  
+  
+
