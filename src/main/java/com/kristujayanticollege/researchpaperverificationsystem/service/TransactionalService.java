@@ -13,14 +13,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionalService {
     @Transactional
-    public void addRsearchDetails(Map<String,Object> researchDetailsRows, UploadRepositoryService uploadRepositoryService,
+    public void addRsearchDetails(Map<String, Object> researchDetailsRows,
+            UploadRepositoryService uploadRepositoryService,
             ResearchDetailsRepositoryService researchDetailsRepositoryService,
             ColumnMapRepositoryService columnMapRepositoryService) throws ParseException, java.text.ParseException {
         @SuppressWarnings("unchecked")
         Upload upload = uploadRepositoryService.save((Map<String, Object>) researchDetailsRows.get("fileDetails"));
-        
-        
-        researchDetailsRepositoryService.addReseachDetails((List<Map<String,Object>>) researchDetailsRows.get("excelData"), upload.getId(),
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> excelData = (List<Map<String, Object>>) researchDetailsRows.get("excelData");
+        researchDetailsRepositoryService.addReseachDetails(excelData, upload.getId(),
                 columnMapRepositoryService.getAllMapping());
 
     }
