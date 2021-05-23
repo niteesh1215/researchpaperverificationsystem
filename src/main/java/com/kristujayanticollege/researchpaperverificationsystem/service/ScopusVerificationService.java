@@ -3,7 +3,6 @@ package com.kristujayanticollege.researchpaperverificationsystem.service;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -90,17 +89,29 @@ public class ScopusVerificationService {
             ScopusResponse scopusResponse = objectMapper.convertValue(response.get("search-results"),
                     ScopusResponse.class);
 
-            System.out.println(scopusResponse);
+            //System.out.println(scopusResponse);
 
             return scopusResponse;
         } catch (Exception e) {
-            System.out.println(e);
+            //System.out.println(e);
             return null;
         }
 
     }
 
     public void verify() {
+
+        //resetting the value for next verification check
+        verificationScore = 0.0;
+        fullNameMatch = false;
+        // orcidMatch = false;
+        manuscriptTitleMatch = false;
+        journalTitleMatch = false;
+        volumeNumberMatch = false;
+        issnMatch = false;
+        lastMatchFoundIndex = -1;
+        matchedEntry = null;
+
         if (this.researchDetailsRow == null)
             throw new IllegalStateException(
                     "researchDetailsRow cannot be null, must call setResearchDetailsRow setter before verify method");
@@ -151,6 +162,13 @@ public class ScopusVerificationService {
         double manuscriptTitleMatchScore = 0;
         double journalTitleMatchScore = 0;
 
+        boolean fullNameMatch = false;
+        // boolean orcidMatch = false;
+        boolean manuscriptTitleMatch = false;
+        boolean journalTitleMatch = false;
+        boolean volumeNumberMatch = false;
+        boolean issnMatch = false;
+
         boolean completeMatchFlag = false;
 
         for (var i = 0; i < entries.size(); i++) {
@@ -195,7 +213,7 @@ public class ScopusVerificationService {
 
             } catch (Exception e) {
 
-                System.out.println(e);
+                //System.out.println(e);
 
             }
 
@@ -214,6 +232,12 @@ public class ScopusVerificationService {
                     lastMatchFoundIndex = i;
                     verificationScore = totalMatchScore;
                     matchedEntry = entries.get(i);
+
+                    this.manuscriptTitleMatch = manuscriptTitleMatch;
+                    this.journalTitleMatch = journalTitleMatch;
+                    this.fullNameMatch = fullNameMatch;
+                    this.issnMatch = issnMatch;
+                    this.volumeNumberMatch = volumeNumberMatch;
                 }
 
                 if (volumeNumberMatch && issnMatch) {
@@ -222,9 +246,7 @@ public class ScopusVerificationService {
                 }
             }
         }
-
         return completeMatchFlag;
-
     }
 
     @Transactional
@@ -250,7 +272,8 @@ public class ScopusVerificationService {
             verificationDetails.setIssnMatch(issnMatch);
             verificationDetails.setFetchedIssn(matchedEntry.getIssn());
 
-            verificationDetails.setVerificationMatchPercentage(verificationScore / 5); // divide by 5 because checked for 5 fields
+            verificationDetails.setVerificationMatchPercentage(verificationScore / 5); // divide by 5 because checked
+                                                                                       // for 5 fields
 
             if (fullNameMatch && manuscriptTitleMatch && journalTitleMatch && volumeNumberMatch) {
                 status = VerificationStatus.FOUND;
