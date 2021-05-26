@@ -63,7 +63,14 @@ public class MainController {
 		return "view/upload";
 	}
 
-	@GetMapping(path = { "/upload", "/" })
+	@GetMapping(path = "/")
+	public ModelAndView dashboard() {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("view/dashboard");
+		return modelAndView;
+	}
+
+	@GetMapping(path = { "/upload" })
 	public ModelAndView index() {
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.setViewName("view/upload");
@@ -82,6 +89,29 @@ public class MainController {
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.setViewName("view/file-upload-list");
 		return modelAndView;
+	}
+
+	@GetMapping(path = "/dashboard-details")
+	public @ResponseBody Map<String, Object> dashboardDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		// researchDetailsRepositoryService.getGroupByIndexingCount();
+		try {
+			map.put("indexing_count_list", researchDetailsRepositoryService.getGroupByIndexingCount());
+			map.put("department_count_list", researchDetailsRepositoryService.getGroupByDepartmentCount());
+			map.put("verification_status_count_list",
+					researchDetailsRepositoryService.getGroupByVerificationStatusCount());
+			map.put("uploads_count", uploadRepositoryService.getTotalUploads());
+			map.put("total_entries", researchDetailsRepositoryService.getCount());
+			map.put("year_wise_count", researchDetailsRepositoryService.getGroupByYearWiseCount());
+			map.put("indexing_wise_verification_status_count", researchDetailsRepositoryService.getGroupByVerificationStatusAndIndexingCount());
+			map.put("status", "success");
+		} catch (Exception e) {
+			map.clear();
+			map.put("error", "error");
+			map.put("message", "An unknown error occurred");
+		}
+
+		return map;
 	}
 
 	@PostMapping(path = "/save")
