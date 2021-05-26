@@ -5,6 +5,14 @@ type = {
   warning: 'warning',
   danger: 'danger',
 };
+
+pieChartShades = {
+  orange: 'orange',
+  green: 'green',
+  blue: 'blue',
+  pink: 'pink',
+}
+
 utilities = {
 
   showNotification: function (from, align, errorType, message, durationInMs = 5000) {
@@ -72,7 +80,53 @@ utilities = {
       }]
     }
   },
+  gradientBarChartConfiguration: {
+    maintainAspectRatio: false,
+    legend: {
+      display: false
+    },
 
+    tooltips: {
+      backgroundColor: '#f5f5f5',
+      titleFontColor: '#333',
+      bodyFontColor: '#666',
+      bodySpacing: 4,
+      xPadding: 12,
+      mode: "nearest",
+      intersect: 0,
+      position: "nearest"
+    },
+    responsive: true,
+    scales: {
+      yAxes: [{
+
+        gridLines: {
+          drawBorder: false,
+          color: 'rgba(29,140,248,0.1)',
+          zeroLineColor: "transparent",
+        },
+        ticks: {
+          padding: 20,
+          fontColor: "#9e9e9e",
+
+        }
+      }],
+
+      xAxes: [{
+
+        gridLines: {
+          drawBorder: false,
+          color: 'rgba(29,140,248,0.1)',
+          zeroLineColor: "transparent",
+        },
+        ticks: {
+          padding: 20,
+          fontColor: "#9e9e9e",
+          autoSkip: false,
+        }
+      }]
+    }
+  },
   gradientChartOptionsConfigurationForPieChart: {
     legend: {
       labels: {
@@ -131,31 +185,86 @@ utilities = {
 
     return myChart;
   },
+  generateBarChart: function (id, jsonData) {
+    var ctx = document.getElementById(id).getContext("2d");
 
-  generateOrangeShadesPiechart: function (id, jsonData) {
+    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
+
+
+    return new Chart(ctx, {
+      type: 'bar',
+      responsive: true,
+      legend: {
+        display: false
+      },
+      data: {
+        labels: Object.keys(jsonData),
+        datasets: [{
+          label: "Department",
+          fill: true,
+          backgroundColor: gradientStroke,
+          hoverBackgroundColor: gradientStroke,
+          borderColor: '#1f8ef1',
+          borderWidth: 2,
+          borderDash: [],
+          borderDashOffset: 0.0,
+          data: Object.values(jsonData),
+        }]
+      },
+      options: this.gradientBarChartConfiguration
+    });
+  },
+  generatePieChart: function (id, jsonData, shade = pieChartShades.orange) {
 
     var ctx = document.getElementById(id).getContext("2d");
 
+    function getOrangeShades() {
+      return [
+        'rgba(255,138,118,0.3)',
+        'rgba(255,138,118,0.6)',
+        'rgba(255,138,118,0.8)',
+        'rgba(255,138,118)',
+      ];
+    }
+
+    function getGreenShades() {
+      return [
+        'rgba(0,214,180,0.3)',
+        'rgba(0,214,180,0.6)',
+        'rgba(0,214,180,0.8)',
+        'rgba(0,214,180)',
+      ];
+    }
+
+    function getBlueShades() {
+      return [
+        'rgba(31,142,241,0.3)',
+        'rgba(31,142,241,0.6)',
+        'rgba(31,142,241,0.8)',
+        'rgba(31,142,241)',
+      ];
+    }
+
+    function getPinkShades() {
+      return [
+        'rgba(208,72,182,0.2)',
+        'rgba(208,72,182,0.5)',
+        'rgba(208,72,182,0.7)',
+        'rgba(208,72,182)',
+      ];
+    }
+
+    var backgroundColor = shade == pieChartShades.orange ? getOrangeShades() : shade == pieChartShades.green ? getGreenShades() : shade == pieChartShades.blue ? getBlueShades() : getPinkShades();
     var data = {
       labels: Object.keys(jsonData),
       datasets: [{
         label: 'My First Dataset',
         data: Object.values(jsonData),
-        backgroundColor: [
-          'rgba(255,138,118,0.3)',
-          'rgba(255,138,118,0.6)',
-          'rgba(255,138,118,0.8)',
-          'rgba(255,138,118)',
-
-          /*'rgba(31,142,241,0.2)',
-          'rgba(31,142,241,0.4)',
-          'rgba(31,142,241,0.7)',
-          'rgba(31,142,241)',
-          'rgba(0,214,180,0.1)',
-          'rgba(0,214,180,0.3)',
-          'rgba(0,214,180,0.6)',
-          'rgba(0,214,180,0.9)', */
-        ],
+        backgroundColor: backgroundColor,
         borderWidth: 0.5,
         hoverOffset: 4
       }]
@@ -194,7 +303,7 @@ utilities = {
       console.log('scrolling to top');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    addTableSearchListener: function (inputSelector ='#search', tableSelector='table tr') {
+    addTableSearchListener: function (inputSelector = '#search', tableSelector = 'table tr') {
       $(inputSelector).keyup(function () {
         var value = this.value.toLowerCase().trim();
         console.log(tableSelector);
@@ -262,7 +371,169 @@ utilities = {
 };
 
 
-/* dashboard */
+//dashboard
+
+dashboardView = {
+  init: function () {
+    this.getData();
+  },
+
+  getData: function () {
+    $.ajax({
+      type: "get",
+      contentType: "application/json",
+      url: "/dashboard-details",
+      timeout: 600000,
+      success: function (data) {
+        if (data.status === 'success')
+          dashboardView.buildUiFromData(data);
+        else
+          utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> Please check the internet connection and refresh the page (Server cannot be reached).');
+
+      },
+      error: function (e) {
+        utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> Please check the internet connection and refresh the page (Server cannot be reached).');
+      }
+    });
+  },
+  buildUiFromData: function (jsonData) {
+    $('.hidden').removeClass('hidden');
+    $('.loading-indicator').remove();
+    $('.total-entries-count span').html(jsonData.total_entries);
+    $('.total-uploads-count span').html(jsonData.uploads_count);
+
+    utilities.generatePieChart('verificationStatusChart', dashboardView.getLabelCountPairJSONData(jsonData.verification_status_count_list),pieChartShades.pink);
+    utilities.generatePieChart('indexingWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.indexing_count_list),pieChartShades.green);
+    dashboardView.displayIndexingWiseVerificationBarChart(jsonData.indexing_wise_verification_status_count);
+    utilities.generateBarChart('departmentWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.department_count_list));
+    utilities.generatePurpleLineChart('yearWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.year_wise_count));
+  },
+  getLabelCountPairJSONData: function (jsonArray) {
+    var labelCountJSONData = {};
+    jsonArray.forEach(function (json) {
+      var keys = Object.keys(json);
+      var labelKeyName;
+      for (var i = 0; i < keys.length; i++) {
+        if (keys[i] != 'count') {
+          labelKeyName = keys[i];
+          break;
+        }
+      }
+      labelCountJSONData[json[labelKeyName]] = json['count'];
+    });
+
+    return labelCountJSONData;
+  },
+
+  displayIndexingWiseVerificationBarChart: function (jsonArray) {
+    var ctx = document.getElementById('indexingWiseverificationStatus').getContext("2d");
+
+    var indexingArray = ['Web of Science', 'Scopus', 'UGC CARE', 'Refereed / Peer Reviewed'];
+
+    function getDatasetTemplate() {
+      return {
+        label: "",
+        fill: true,
+        backgroundColor: "",
+        borderColor: '',
+        borderWidth: 2,
+        borderDash: [],
+        borderDashOffset: 0.0,
+        pointBackgroundColor: '',
+        pointBorderColor: 'rgba(255,255,255,0)',
+        pointHoverBackgroundColor: '',
+        pointBorderWidth: 20,
+        pointHoverRadius: 4,
+        pointHoverBorderWidth: 15,
+        pointRadius: 4,
+        data: [],
+      };
+    }
+
+
+    var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientStroke.addColorStop(1, 'rgba(72,72,176,0.2)');
+    gradientStroke.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+    gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
+    var notVerifiedDataset = getDatasetTemplate();
+    notVerifiedDataset.label = "not verified";
+    notVerifiedDataset.backgroundColor = gradientStroke;
+    notVerifiedDataset.borderColor = '#d048b6';
+    notVerifiedDataset.pointBackgroundColor = '#d048b6';
+    notVerifiedDataset.pointHoverBackgroundColor = '#d048b6';
+
+
+    //notVerifiedDataset.type ='bar';
+
+    gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
+    var notFoundDataset = getDatasetTemplate();
+    notFoundDataset.label = "not found";
+    notFoundDataset.backgroundColor = gradientStroke;
+    notFoundDataset.borderColor = '#1f8ef1';
+    notFoundDataset.pointBackgroundColor = '#1f8ef1';
+    notFoundDataset.pointHoverBackgroundColor = '#1f8ef1';
+    //notFoundDataset.type='bar';
+
+    gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+    gradientStroke.addColorStop(1, 'rgba(66,134,121,0.15)');
+    gradientStroke.addColorStop(0.4, 'rgba(66,134,121,0.0)'); //green colors
+    gradientStroke.addColorStop(0, 'rgba(66,134,121,0)'); //green colors
+    var foundDataset = getDatasetTemplate();
+    foundDataset.label = "found";
+    foundDataset.backgroundColor = gradientStroke;
+    foundDataset.borderColor = '#00d6b4';
+    foundDataset.pointBackgroundColor = '#00d6b4';
+    foundDataset.pointHoverBackgroundColor = '#00d6b4';
+    //foundDataset.type = 'bar';
+
+    var notVerifiedArray = [];
+    var notFoundArray = [];
+    var foundArray = [];
+    for (var j = 0; j < indexingArray.length; j++) {
+      var verificationStatusJson = {
+        'not_verified': 0,
+        'not_found': 0,
+        'found': 0,
+      };
+      for (var i = 0; i < jsonArray.length; i++) {
+        if (jsonArray[i].indexing == indexingArray[j]) {
+          verificationStatusJson[jsonArray[i].verification_status] = jsonArray[i].count;
+        }
+      }
+
+      notVerifiedArray.push(verificationStatusJson.not_verified);
+      notFoundArray.push(verificationStatusJson.not_found);
+      foundArray.push(verificationStatusJson.found);
+    }
+
+    notVerifiedDataset.data = notVerifiedArray;
+    foundDataset.data = foundArray;
+    notFoundDataset.data = notFoundArray;
+
+
+    var data = {
+      labels: indexingArray,
+      datasets: [notVerifiedDataset, notFoundDataset, foundDataset],
+    };
+
+    console.log([notVerifiedDataset, notFoundDataset, foundDataset]);
+    console.log([notVerifiedArray, notFoundArray, foundArray]);
+
+
+    utilities.gradientBarChartConfiguration.legend.display = true;
+    var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: data,
+      options: utilities.gradientBarChartConfiguration,
+    });
+
+    utilities.gradientBarChartConfiguration.legend.display = false;
+
+  }
+};
 
 //upload menu option
 uploadView = {
@@ -424,7 +695,7 @@ uploadView = {
 
     function displayIndexWiseCountGraph(jsonIndexWiseCoutData) {
 
-      var myPiechart = utilities.generateOrangeShadesPiechart("indexChart", jsonIndexWiseCoutData);
+      var myPiechart = utilities.generatePieChart("indexChart", jsonIndexWiseCoutData);
 
     }
 
@@ -740,7 +1011,7 @@ fileUploadsListView = {
     var jsonIndexWiseCoutData = utilities.functions.getUniqueFieldCount(jsonData, 'indexing');
 
     var myLineChart = utilities.generatePurpleLineChart("chartLinePurple", jsonDepartmentWiseCountData);
-    var myPiechart = utilities.generateOrangeShadesPiechart("indexChart", jsonIndexWiseCoutData);
+    var myPiechart = utilities.generatePieChart("indexChart", jsonIndexWiseCoutData);
 
     var detailsTableView = $('#detailsTableView');
 
@@ -906,11 +1177,11 @@ fileUploadsListView = {
   addEventListeners: function () {
 
     //search textbox listener
-    utilities.functions.addTableSearchListener('#search','#fileUploadListTable tr');
+    utilities.functions.addTableSearchListener('#search', '#fileUploadListTable tr');
 
-    $('.selection-count').on('click','#unselectCheckboxes',function(){
+    $('.selection-count').on('click', '#unselectCheckboxes', function () {
       fileUploadsListView.checkedList = [];
-      $('#detailsTableView input:checkbox').prop('checked',false);
+      $('#detailsTableView input:checkbox').prop('checked', false);
       $(".action-buttons, .selection-count").addClass('hidden');
       $('#addNewRow').removeClass('hidden');
     });
@@ -925,7 +1196,7 @@ fileUploadsListView = {
       fileUploadsListView.checkedList = [];
 
       $('#search').unbind();
-      utilities.functions.addTableSearchListener('#search','#detailsTableView table tr');
+      utilities.functions.addTableSearchListener('#search', '#detailsTableView table tr');
       fileUploadsListView.fetchResearchDetailsAndBuildUI();
     });
 
@@ -977,7 +1248,7 @@ fileUploadsListView = {
     //back button click listener
     $('.back-button').on('click', function () {
       $('#search').unbind();
-      utilities.functions.addTableSearchListener('#search','#fileUploadListTable tr');
+      utilities.functions.addTableSearchListener('#search', '#fileUploadListTable tr');
       $('#tableView').removeClass('hidden');
       $('#detailsView').addClass('hidden');
     });
