@@ -297,3 +297,8 @@ span.custom-modal-close:focus {
  max-height: 80vh;
  overflow-y: scroll;
 };
+
+
+.height700px {
+  max-height: 700px !important;
+}
