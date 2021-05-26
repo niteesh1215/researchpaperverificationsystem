@@ -169,4 +169,50 @@ public class ResearchDetailsRepositoryService {
         jdbcTemplate.update(sql, verificationStatusValue, researchDetailsRowId);
     }
 
+    public Long getCount() {
+        String sql = "SELECT COUNT(id) as count FROM `research_details`";
+
+        return jdbcTemplate.queryForObject(sql, Long.class);
+    }
+
+    public List<Map<String, Object>> getGroupByIndexingCount() {
+        String sql = "SELECT COUNT(id) as count, `indexing` FROM `research_details` GROUP BY `indexing`";
+
+        List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
+
+        return counts;
+    }
+
+    public List<Map<String, Object>> getGroupByDepartmentCount() {
+        String sql = "SELECT COUNT(id) as count, `department` FROM `research_details` GROUP BY `department`";
+
+        List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
+
+        return counts;
+    }
+
+    public List<Map<String, Object>> getGroupByVerificationStatusCount() {
+        String sql = "SELECT COUNT(id) as count, `verification_status` FROM `research_details` GROUP BY `verification_status`";
+
+        List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
+
+        return counts;
+    }
+
+    public List<Map<String, Object>> getGroupByYearWiseCount() {
+        String sql = "SELECT COUNT(id) as count, `year` FROM `research_details` GROUP BY `year`";
+
+        List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
+
+        return counts;
+    }
+
+    public List<Map<String, Object>> getGroupByVerificationStatusAndIndexingCount() {
+        String sql = "SELECT COUNT(id) as count, `verification_status`, `indexing` FROM `research_details` GROUP BY `verification_status`,`indexing`";
+
+        List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
+
+        return counts;
+    }
+
 }
