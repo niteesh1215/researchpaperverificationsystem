@@ -40,4 +40,8 @@ public class UploadRepositoryService {
     public void deleteUploadById(Long id) {
         uploadRepository.deleteById(id);
     }
+
+    public Long getTotalUploads() {
+        return uploadRepository.count();
+    }
 }
