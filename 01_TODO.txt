@@ -1,0 +1,10 @@
+
+1. faculty wise submission details export
+
+2. Formatting columns
+Manu. title
+teacher 
+journal name
+month Jan-Feb
+
+3. Verification Status chart
