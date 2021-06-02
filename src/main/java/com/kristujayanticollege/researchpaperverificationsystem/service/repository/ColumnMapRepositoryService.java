@@ -1,4 +1,4 @@
-package com.kristujayanticollege.researchpaperverificationsystem.service;
+package com.kristujayanticollege.researchpaperverificationsystem.service.repository;
 
 import java.util.List;
 

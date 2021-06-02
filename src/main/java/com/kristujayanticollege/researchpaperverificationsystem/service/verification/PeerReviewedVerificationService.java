@@ -1,4 +1,4 @@
-package com.kristujayanticollege.researchpaperverificationsystem.service;
+package com.kristujayanticollege.researchpaperverificationsystem.service.verification;
 
 import java.net.URL;
 import java.net.URLEncoder;
@@ -22,6 +22,9 @@ import com.gargoylesoftware.htmlunit.javascript.SilentJavaScriptErrorListener;
 import com.kristujayanticollege.researchpaperverificationsystem.model.ResearchDetailsRow;
 import com.kristujayanticollege.researchpaperverificationsystem.model.VerificationDetails;
 import com.kristujayanticollege.researchpaperverificationsystem.projectenums.VerificationStatus;
+import com.kristujayanticollege.researchpaperverificationsystem.service.other.WebPagePdfExtractor;
+import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ResearchDetailsRepositoryService;
+import com.kristujayanticollege.researchpaperverificationsystem.service.repository.VerificationDetailsRepositoryService;
 
 import org.apache.commons.lang3.StringUtils;
 

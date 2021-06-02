@@ -1,4 +1,4 @@
-package com.kristujayanticollege.researchpaperverificationsystem.service;
+package com.kristujayanticollege.researchpaperverificationsystem.service.other;
 
 import java.util.List;
 import java.util.Map;
@@ -6,6 +6,9 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import com.kristujayanticollege.researchpaperverificationsystem.model.Upload;
+import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ColumnMapRepositoryService;
+import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ResearchDetailsRepositoryService;
+import com.kristujayanticollege.researchpaperverificationsystem.service.repository.UploadRepositoryService;
 
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;

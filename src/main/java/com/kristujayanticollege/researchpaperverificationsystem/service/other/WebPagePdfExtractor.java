@@ -1,4 +1,4 @@
-package com.kristujayanticollege.researchpaperverificationsystem.service;
+package com.kristujayanticollege.researchpaperverificationsystem.service.other;
 
 import java.io.IOException;
 import java.io.InputStream;

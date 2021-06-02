@@ -1,4 +1,4 @@
-package com.kristujayanticollege.researchpaperverificationsystem.service;
+package com.kristujayanticollege.researchpaperverificationsystem.service.repository;
 
 import com.kristujayanticollege.researchpaperverificationsystem.model.ColumnMap;
 import com.kristujayanticollege.researchpaperverificationsystem.model.RPVSEnums;

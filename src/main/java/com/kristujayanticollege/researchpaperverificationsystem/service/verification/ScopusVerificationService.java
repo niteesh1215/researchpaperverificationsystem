@@ -1,4 +1,4 @@
-package com.kristujayanticollege.researchpaperverificationsystem.service;
+package com.kristujayanticollege.researchpaperverificationsystem.service.verification;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -15,6 +15,8 @@ import com.kristujayanticollege.researchpaperverificationsystem.model.ScopusEntr
 import com.kristujayanticollege.researchpaperverificationsystem.model.ScopusResponse;
 import com.kristujayanticollege.researchpaperverificationsystem.model.VerificationDetails;
 import com.kristujayanticollege.researchpaperverificationsystem.projectenums.VerificationStatus;
+import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ResearchDetailsRepositoryService;
+import com.kristujayanticollege.researchpaperverificationsystem.service.repository.VerificationDetailsRepositoryService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
