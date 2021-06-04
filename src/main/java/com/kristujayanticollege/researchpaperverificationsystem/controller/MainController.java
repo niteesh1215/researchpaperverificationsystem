@@ -58,9 +58,11 @@ public class MainController {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@GetMapping(path = "/hello")
-	public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-		return "view/upload";
+	@GetMapping(path = "/login")
+	public ModelAndView login() {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("view/login");
+		return modelAndView;
 	}
 
 	@GetMapping(path = "/")
