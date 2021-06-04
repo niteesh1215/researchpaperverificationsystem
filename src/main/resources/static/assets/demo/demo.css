@@ -1,3 +1,37 @@
+
+/* login css */
+.box {
+  text-align: center;
+  transition: 0.25s;
+}
+
+.box input[type="text"],
+.box input[type="password"] {
+  border: 0;
+  background: none;
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+  border: 2px solid #ff8a76;
+  padding: 10px 10px;
+  width: 250px;
+  outline: none;
+  color: white;
+  border-radius: 5px;
+  transition: 0.25s
+}
+
+.box input[type="text"]:focus,
+.box input[type="password"]:focus {
+  width: 300px;
+  border-color:#d048b6;
+}
+
+.forgot {
+  text-decoration: underline
+}
+/*login css end */
+
 .tim-row {
   margin-bottom: 20px;
 }
