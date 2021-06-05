@@ -299,10 +299,6 @@ utilities = {
       }
       return obj;
     },
-    scrollToTop: function () {
-      console.log('scrolling to top');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
     addTableSearchListener: function (inputSelector = '#search', tableSelector = 'table tr') {
       $(inputSelector).keyup(function () {
         var value = this.value.toLowerCase().trim();
@@ -317,7 +313,7 @@ utilities = {
           });
         });
       });
-    }
+    },
   },
 
   customModal: {
@@ -377,7 +373,6 @@ dashboardView = {
   init: function () {
     this.getData();
   },
-
   getData: function () {
     $.ajax({
       type: "get",
@@ -538,6 +533,7 @@ dashboardView = {
 //upload menu option
 uploadView = {
   init: async function () {
+
 
     const actualBtn = document.getElementById('actual-upload-btn');
     const fileChosen = document.getElementById('file-chosen');
@@ -932,7 +928,6 @@ columnListView = {
 };
 
 //file uploads list view
-
 fileUploadsListView = {
   init: function () {
     this.getFileUploads(this.buildTable);

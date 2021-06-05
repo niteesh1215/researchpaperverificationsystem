@@ -20,7 +20,7 @@ public class UserDetailsAuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(userName);
+        Optional<User> user = userRepository.findByUserName(userName);
 
         user.orElseThrow(()-> new UsernameNotFoundException("Not found " + userName));
         return user.map(RPVSUserDetails::new).get();

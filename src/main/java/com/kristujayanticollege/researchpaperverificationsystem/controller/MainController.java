@@ -11,7 +11,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.kristujayanticollege.researchpaperverificationsystem.model.ColumnMap;
 import com.kristujayanticollege.researchpaperverificationsystem.model.ResearchDetailsRow;
 import com.kristujayanticollege.researchpaperverificationsystem.model.Upload;
+import com.kristujayanticollege.researchpaperverificationsystem.model.User;
 import com.kristujayanticollege.researchpaperverificationsystem.model.VerificationDetails;
+import com.kristujayanticollege.researchpaperverificationsystem.repository.UserRepository;
 import com.kristujayanticollege.researchpaperverificationsystem.service.other.TransactionalService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ColumnMapRepositoryService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ResearchDetailsRepositoryService;
@@ -26,11 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -48,6 +50,12 @@ public class MainController {
 
 	@Autowired
 	private VerificationDetailsRepositoryService verificationRepositoryService;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 
 	@Autowired
 	WebClient.Builder webClientBuilder;
@@ -109,7 +117,7 @@ public class MainController {
 			map.put("status", "success");
 		} catch (Exception e) {
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			map.put("message", "An unknown error occurred");
 		}
 
@@ -128,7 +136,7 @@ public class MainController {
 			return ResponseEntity.status(HttpStatus.OK).body(map);
 		} catch (Exception e) {
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			if (e.toString().contains("UNIQUE")) {
 				map.put("message", "file name exists");
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
@@ -161,7 +169,7 @@ public class MainController {
 		} catch (Exception e) {
 			System.out.println(e);
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			map.put("message", "An unknown error occurred");
 			return map;
 		}
@@ -187,7 +195,7 @@ public class MainController {
 			return map;
 		} catch (Exception e) {
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			map.put("message", "An unknown error occurred");
 			return map;
 		}
@@ -205,7 +213,7 @@ public class MainController {
 		} catch (Exception e) {
 			System.out.println(e);
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			map.put("message", "An unknown error occurred");
 			return map;
 		}
@@ -222,11 +230,11 @@ public class MainController {
 		try {
 			columnMapRepositoryService.addNewMapping(columnMap);
 			map.put("status", "success");
-			map.put("message", "Successfuly deleted");
+			map.put("message", "Successfuly added");
 			return ResponseEntity.status(HttpStatus.OK).body(map);
 		} catch (Exception e) {
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			if (e.toString().contains("UNIQUE")) {
 				map.put("message", "column/mapped name exists");
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
@@ -247,7 +255,7 @@ public class MainController {
 			return new ResponseEntity<HashMap<String, String>>(map, HttpStatus.OK);
 		} catch (Exception e) {
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			map.put("message", "An unknown error occurred");
 			return new ResponseEntity<HashMap<String, String>>(map, HttpStatus.NOT_FOUND);
 		}
@@ -268,7 +276,7 @@ public class MainController {
 			return new ResponseEntity<HashMap<String, String>>(map, HttpStatus.OK);
 		} catch (Exception e) {
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			map.put("message", "An unknown error occurred");
 			return new ResponseEntity<HashMap<String, String>>(map, HttpStatus.NOT_FOUND);
 		}
@@ -336,7 +344,7 @@ public class MainController {
 		} catch (Exception e) {
 			System.out.println(e);
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			map.put("message", "An unknown error occurred");
 			return map;
 		}
@@ -394,7 +402,7 @@ public class MainController {
 			return map;
 		} catch (Exception e) {
 			map.clear();
-			map.put("error", "error");
+			map.put("status", "error");
 			map.put("message", "An unknown error occurred");
 			return map;
 		}
@@ -408,5 +416,27 @@ public class MainController {
 			return details.get();
 		else
 			return new VerificationDetails();
+	}
+
+	@PostMapping(path="/add-new-user")
+	public @ResponseBody HashMap<String, String> addNewUser(@RequestBody User user) {
+		HashMap<String, String> map = new HashMap<>();
+		try {
+			user.setPassword(passwordEncoder.encode(user.getPassword()));
+			userRepository.save(user);
+			map.put("status", "success");
+			map.put("message", "Successfuly added");
+			return map;
+		} catch (Exception e) {
+			map.clear();
+			map.put("status", "error");
+			if (e.toString().contains("UNIQUE")) {
+				map.put("message", "username exists");
+				return map;
+			} else {
+				map.put("message", "An unknown error occurred");
+				return map;
+			}
+		}
 	}
 }

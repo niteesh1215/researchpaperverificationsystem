@@ -47,10 +47,10 @@
                         <br><br>
                         <input class = "btn btn-warning animation-on-hover" type="submit" name="" value="Login" href="#">
 
-                        <div th:if="${param.error}">
-                            Invalid username and password.
+                        <div th:if="${param.error}" class="text-danger pt-2">
+                            Invalid username or password.
                         </div>
-                        <div th:if="${param.logout}">
+                        <div th:if="${param.logout}" class="text-info pt-2">
                             You have been logged out.
                         </div>
                     </form>

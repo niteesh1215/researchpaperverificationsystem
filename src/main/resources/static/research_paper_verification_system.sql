@@ -1,6 +1,6 @@
 CREATE TABLE `research_paper_verification_system`.`research_details` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `group_id` INT NOT NULL DEFAULT NULL,
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `group_id` BIGINT NOT NULL DEFAULT NULL,
   `date` VARCHAR(50) NULL DEFAULT NULL,
   `email_address` VARCHAR(100) NULL DEFAULT NULL,
   `salutation` VARCHAR(10) NULL DEFAULT NULL,
@@ -79,7 +79,7 @@ INSERT INTO `research_paper_verification_system`.`column_map` (`id`, `column_nam
 INSERT INTO `research_paper_verification_system`.`column_map` (`id`, `column_name`, `mapped_name`) VALUES ('25', 'Is_authorship_affiliated_to_kjc', 'is the Authorship affiliated to Kristu Jayanti College?');
 
 CREATE TABLE `research_paper_verification_system`.`upload` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
   `file_name` VARCHAR(255) NOT NULL,
   `date` DATE NOT NULL,
   `description` VARCHAR(300) NULL DEFAULT '',
@@ -99,7 +99,7 @@ ADD CONSTRAINT `group_id_foreign_key`
   ON UPDATE NO ACTION;
   
   CREATE TABLE `research_paper_verification_system`.`verification_details` (
-  `research_details_row_id` INT NOT NULL,
+  `research_details_row_id` BIGINT NOT NULL,
   `fetched_full_name` VARCHAR(255) NULL,
   `full_name_match` TINYINT(1) NULL DEFAULT 0,
   `fetched_manuscript_title` VARCHAR(300) NULL,
@@ -148,8 +148,20 @@ UPDATE `research_paper_verification_system`.`column_map` SET `data_length` = '5'
 
 ALTER TABLE `research_paper_verification_system`.`verification_details` 
 ADD COLUMN `found_url_1` VARCHAR(255) NULL DEFAULT '' AFTER `verification_match_percentage`,
-ADD COLUMN `found_url_2` VARCHAR(255) NULL DEFAULT '' AFTER `found_url_1`,
-ADD COLUMN `found_url_3` VARCHAR(255) NULL DEFAULT '' AFTER `found_url_2`;
+ADD COLUMN `found_url_2` VARCHAR(255) NULL DEFAULT '' AFTER `found_url_1`;
+
+CREATE TABLE `user` (
+  `id` bigint NOT NULL,
+  `active` bit(1) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `roles` varchar(255) NOT NULL,
+  `user_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_name_UNIQUE` (`user_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
 
 
 /*
