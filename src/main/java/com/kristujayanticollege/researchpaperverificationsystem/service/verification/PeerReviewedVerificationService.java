@@ -76,7 +76,6 @@ public class PeerReviewedVerificationService {
 
             @Override
             public void notify(String arg0, Object arg1) {
-                // TODO Auto-generated method stub
 
             }
         });
@@ -85,13 +84,11 @@ public class PeerReviewedVerificationService {
 
             @Override
             public void error(String arg0, URL arg1, String arg2, int arg3, int arg4, String arg5) {
-                // TODO Auto-generated method stub
 
             }
 
             @Override
             public void warning(String arg0, URL arg1, String arg2, int arg3, int arg4, String arg5) {
-                // TODO Auto-generated method stub
 
             }
 
