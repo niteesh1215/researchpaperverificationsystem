@@ -13,6 +13,15 @@ pieChartShades = {
   pink: 'pink',
 }
 
+var token_csrf, header_csrf;
+
+$(document).ready(function () {
+  token_csrf = $("meta[name='_csrf']").attr("content");
+  header_csrf = $("meta[name='_csrf_header']").attr("content");
+  console.log(header_csrf);
+  console.log(token_csrf);
+});
+
 utilities = {
 
   showNotification: function (from, align, errorType, message, durationInMs = 5000) {
@@ -397,8 +406,8 @@ dashboardView = {
     $('.total-entries-count span').html(jsonData.total_entries);
     $('.total-uploads-count span').html(jsonData.uploads_count);
 
-    utilities.generatePieChart('verificationStatusChart', dashboardView.getLabelCountPairJSONData(jsonData.verification_status_count_list),pieChartShades.pink);
-    utilities.generatePieChart('indexingWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.indexing_count_list),pieChartShades.green);
+    utilities.generatePieChart('verificationStatusChart', dashboardView.getLabelCountPairJSONData(jsonData.verification_status_count_list), pieChartShades.pink);
+    utilities.generatePieChart('indexingWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.indexing_count_list), pieChartShades.green);
     dashboardView.displayIndexingWiseVerificationBarChart(jsonData.indexing_wise_verification_status_count);
     utilities.generateBarChart('departmentWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.department_count_list));
     utilities.generatePurpleLineChart('yearWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.year_wise_count));
@@ -767,12 +776,16 @@ uploadView = {
 
     });
 
+    var headers ={};
+    headers[header_csrf] = token_csrf;
+
     function saveData(jsonData) {
       $.ajax({
         type: "post",
         contentType: "application/json",
         url: "/save",
         data: JSON.stringify(jsonData),
+        headers: headers,
         dataType: 'json',
         cache: false,
         timeout: 600000,
@@ -847,9 +860,13 @@ columnListView = {
 
       $('#addColumMappingModel').modal('hide');
 
+      var headers ={};
+        headers[header_csrf] = token_csrf;
+
       $.ajax({
         type: "post",
         contentType: "application/json",
+        headers: headers,
         url: "/add-new-column-mapping",
         data: JSON.stringify(columnDetails),
         dataType: 'json',
@@ -1348,9 +1365,14 @@ fileUploadsListView = {
         $(this).unbind();
         utilities.showNotification('top', 'center', type.info, '<strong>Delete initiated!</strong> Please wait....', 3000);
         const ids = fileUploadsListView.checkedList.map(obj => obj.id);
+        
+        var headers ={};
+        headers[header_csrf] = token_csrf;
+
         $.ajax({
           type: "post",
           contentType: "application/json",
+          headers: headers,
           url: '/delete-rows',
           dataType: 'json',
           data: JSON.stringify(ids),
@@ -1372,6 +1394,7 @@ fileUploadsListView = {
 
           },
           error: function (e) {
+            console.log(e);
             utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to delete the row(s).');
           }
         });
@@ -1431,10 +1454,14 @@ fileUploadsListView = {
 
       utilities.showNotification('top', 'center', type.info, `<strong>${initializeMessage}</strong> Please wait....`);
 
+      var headers ={};
+        headers[header_csrf] = token_csrf;
+
       $.ajax({
         type: "post",
         contentType: "application/json",
         url: action,
+        headers: headers,
         dataType: 'json',
         data: JSON.stringify(rowDetails),
         cache: false,
@@ -1457,10 +1484,15 @@ fileUploadsListView = {
 
       utilities.showNotification('top', 'center', type.info, '<strong>Reverifying!</strong> Please wait....', 3000);
       const ids = fileUploadsListView.checkedList.map(obj => obj.id);
+
+      var headers ={};
+        headers[header_csrf] = token_csrf;
+
       $.ajax({
         type: "post",
         contentType: "application/json",
         url: '/verify-rows',
+        headers: headers,
         dataType: 'json',
         data: JSON.stringify(ids),
         cache: false,
@@ -1487,8 +1519,4 @@ fileUploadsListView = {
     });
 
   },
-
-
-
-
 }
