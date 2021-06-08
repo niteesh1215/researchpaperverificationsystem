@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kristujayanticollege.researchpaperverificationsystem.model.VerificationDetails;
 import com.kristujayanticollege.researchpaperverificationsystem.service.other.TransactionalService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ColumnMapRepositoryService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ResearchDetailsRepositoryService;
@@ -36,6 +37,8 @@ public class ResearchDetailsController {
 
     @Autowired
     private UploadRepositoryService uploadRepositoryService;
+
+
 
     @PostMapping(path = "/save")
     public ResponseEntity<HashMap<String, String>> save(@RequestBody Map<String, Object> researchDetailsRows) {
@@ -132,4 +135,5 @@ public class ResearchDetailsController {
             return map;
         }
     }
+
 }
