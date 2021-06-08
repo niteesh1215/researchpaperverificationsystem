@@ -776,7 +776,7 @@ uploadView = {
 
     });
 
-    var headers ={};
+    var headers = {};
     headers[header_csrf] = token_csrf;
 
     function saveData(jsonData) {
@@ -860,8 +860,8 @@ columnListView = {
 
       $('#addColumMappingModel').modal('hide');
 
-      var headers ={};
-        headers[header_csrf] = token_csrf;
+      var headers = {};
+      headers[header_csrf] = token_csrf;
 
       $.ajax({
         type: "post",
@@ -1365,8 +1365,8 @@ fileUploadsListView = {
         $(this).unbind();
         utilities.showNotification('top', 'center', type.info, '<strong>Delete initiated!</strong> Please wait....', 3000);
         const ids = fileUploadsListView.checkedList.map(obj => obj.id);
-        
-        var headers ={};
+
+        var headers = {};
         headers[header_csrf] = token_csrf;
 
         $.ajax({
@@ -1454,8 +1454,8 @@ fileUploadsListView = {
 
       utilities.showNotification('top', 'center', type.info, `<strong>${initializeMessage}</strong> Please wait....`);
 
-      var headers ={};
-        headers[header_csrf] = token_csrf;
+      var headers = {};
+      headers[header_csrf] = token_csrf;
 
       $.ajax({
         type: "post",
@@ -1485,8 +1485,8 @@ fileUploadsListView = {
       utilities.showNotification('top', 'center', type.info, '<strong>Reverifying!</strong> Please wait....', 3000);
       const ids = fileUploadsListView.checkedList.map(obj => obj.id);
 
-      var headers ={};
-        headers[header_csrf] = token_csrf;
+      var headers = {};
+      headers[header_csrf] = token_csrf;
 
       $.ajax({
         type: "post",
@@ -1514,9 +1514,145 @@ fileUploadsListView = {
     });
 
     //row verification info button listener
-    $('#rowVerificationInfoButton').on('click', (e) => {
-      alert(this.checkedList);
+    $('#rowVerificationInfoButton').on('click', function (e) {
+      if (fileUploadsListView.checkedList.length > 1)
+        utilities.showNotification('top', 'center', type.info, '<strong>Multiple rows selected!</strong> Choosing the first selected.', 3000);
+      var id = fileUploadsListView.checkedList[0].id;
+      $.ajax({
+        type: "get",
+        contentType: "application/json",
+        url: `/verification-details/${id}`,
+        dataType: 'json',
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+          console.log(data);
+          showVerificationInfoModel(data);
+          //utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> File was deleted successfuly.');
+        },
+        error: function (e) {
+          console.log(e);
+          utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to retrieve the details.');
+        }
+      });
+
+
+
+
     });
 
   },
+}
+
+
+
+function showVerificationInfoModel(verificationInfoJson) {
+  if (verificationInfoJson.id == null) {
+    utilities.showNotification('top', 'center', type.danger, '<strong>Not Found!</strong> Verification information is not available.');
+    return;
+  }
+  var modalBody = '<div class="row"><div class="col-12">';
+  /*checking if repository details are available or not by checking if fullName is not null.
+    checking only full name because if full name is present then other details will be present.
+  */
+  if (verificationInfoJson.fullName != null)
+    modalBody += `<div class="card">
+      <div class="card-header">
+          <h2 class="card-category">Details found in the repository</h5>
+      </div>
+      <div class="card-body">
+          <div class="row">
+              <div class="col-12 col-lg-6 col-xl-6">
+                  Full Name: <span class="text-info"> ${verificationInfoJson.fullName}</span>
+              </div>
+              <div class="col-12 col-lg-6 col-xl-6">
+                  Manuscript Title : <span class="text-info"> ${verificationInfoJson.manuscriptTitle}</span>
+              </div>
+              <div class="col-12 col-lg-6 col-xl-6">
+                  Journal Title : <span class="text-info"> ${verificationInfoJson.journalTitle}</span>
+              </div>
+              <div class="col-12 col-lg-6 col-xl-6">
+                  ISSN : <span class="text-info"> ${verificationInfoJson.issn}</span>
+              </div>
+              <div class="col-12 col-lg-6 col-xl-6">
+                  Volume Number : <span class="text-info"> ${verificationInfoJson.volumeNumber}</span>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>`;
+
+  // match info card
+  modalBody += `<div class="col-12">
+  <div class="card">
+      <div class="card-header">
+          <h2 class="card-category">Match details</h5>
+      </div>
+      <div class="card-body">
+          <div class="row">`;
+
+  var matchStatusSpan = verificationInfoJson.fullNameMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+     Full Name Match: ${matchStatusSpan}
+ </div>`;
+
+  matchStatusSpan = verificationInfoJson.manuscriptTitleMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+    Manuscript Title Match: ${matchStatusSpan}
+  </div>`;
+
+  matchStatusSpan = verificationInfoJson.journalTitleMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+   Journal Title Match: ${matchStatusSpan}
+  </div>`;
+
+  matchStatusSpan = verificationInfoJson.issnMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+  ISSN Match: ${matchStatusSpan}
+  </div>`;
+
+  matchStatusSpan = verificationInfoJson.volumeNumberMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+  Volume Number Match: ${matchStatusSpan}
+  </div>`;
+
+  modalBody += '</div></div></div></div>';
+
+  //found url card
+
+  if ((verificationInfoJson.foundAtUrls != null) && (verificationInfoJson.foundAtUrls.length != 0)) {
+    modalBody += `<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-category">Found Url</h5>
+        </div>
+        <div class="card-body">`;
+    var i = 1;
+    verificationInfoJson.foundAtUrls.forEach(function (url) {
+      modalBody += `<a href="${url}"><button class="btn btn-warning animation-on-hover" type="button">Visit Url ${i++}</button></a>`
+    });
+
+    modalBody += ` </div>
+      </div>
+    </div>
+  </div>`;
+  }
+  modalBody += '</div>';
+
+  console.log(modalBody);
+
+  $('#verificationInfoModal .modal-body').html(modalBody);
+
+  var confirmationModal = $('#verificationInfoModal');
+
+  confirmationModal.modal({
+    backdrop: 'static'
+  });
+
+  confirmationModal.modal('show');
 }
