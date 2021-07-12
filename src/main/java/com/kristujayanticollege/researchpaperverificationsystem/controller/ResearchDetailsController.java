@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.kristujayanticollege.researchpaperverificationsystem.model.VerificationDetails;
 import com.kristujayanticollege.researchpaperverificationsystem.service.other.TransactionalService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ColumnMapRepositoryService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ResearchDetailsRepositoryService;
