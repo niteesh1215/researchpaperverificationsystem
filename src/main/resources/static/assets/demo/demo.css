@@ -14,7 +14,7 @@
   text-align: center;
   border: 2px solid #ff8a76;
   padding: 10px 10px;
-  width: 250px;
+  width: 80%;
   outline: none;
   color: white;
   border-radius: 5px;
@@ -23,7 +23,7 @@
 
 .box input[type="text"]:focus,
 .box input[type="password"]:focus {
-  width: 300px;
+  width: 100%;
   border-color:#d048b6;
 }
 
