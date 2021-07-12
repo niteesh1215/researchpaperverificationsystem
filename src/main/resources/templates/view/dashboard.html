@@ -4,9 +4,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'  https://maxcdn.bootstrapcdn.com https://ajax.googleapis.com https://use.fontawesome.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.trackjs.com https://cdnjs.cloudflare.com; font-src *;connect-src *; media-src *;">
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'  https://maxcdn.bootstrapcdn.com https://ajax.googleapis.com https://use.fontawesome.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.trackjs.com https://cdnjs.cloudflare.com; font-src *;connect-src *; media-src *;">
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
   <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
@@ -20,9 +21,19 @@
   <link href="/assets/css/nucleo-icons.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link href="/assets/css/black-dashboard.css" rel="stylesheet" />
-
+  <!-- jquery ui css -->
+  <link href="/assets/jqueryui/jquery-ui.min.css" rel="stylesheet">
   <!-- CSS Just for demo purpose, don't include it in your project -->
   <link href="/assets/demo/demo.css" rel="stylesheet" />
+  <style>
+    .ptr-none {
+      pointer-events: none;
+    }
+
+    .row .card {
+      pointer-events: auto;
+    }
+  </style>
 </head>
 
 <body class="">
@@ -166,14 +177,58 @@
             <div></div>
           </div>
         </div>
-        <div class="hidden">
+
+        <div class="row hidden" id="filtersSection">
+          <div class="col">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-category">Filters</h5>
+                    <button class="btn btn-default btn-fab btn-icon btn-round" id="filterClose" title="close">
+                      <i class="tim-icons icon-simple-remove text-danger"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <form id="filtersForm">
+                  <div class="row" id="filters">
+
+                  </div>
+                  <div class="row">
+                    <div class="col-12 d-flex justify-content-between ">
+                      <button class="btn btn-warning animation-on-hover" type="reset"
+                        id="filtersResetButton">Reset</button>
+                      <button class="btn btn-primary animation-on-hover" type="button"
+                        id="filtersApplyButton">Apply</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-ui hidden">
           <div class="row">
             <div class="col-lg-2 col-xl-2">
               <div class="row">
+                <div class="col-4 col-lg-12 d-flex justify-content-around pb-4">
+                  <button class="btn btn-info btn-fab btn-icon btn-round animation-on-hover" title="show filters"
+                    id="showFilters" type="button">
+                    <i class="fas fa-filter text-secondary"></i>
+                  </button>
+                  <button class="btn btn-warning btn-fab btn-icon btn-round animation-on-hover" id="resetPlacements"
+                    title="reset placements and size" type="button">
+                    <i class="fas fa-redo"></i>
+                  </button>
+                </div>
                 <div class="col-4 col-lg-12">
                   <div class="card">
                     <div class="card-header">
                       <h5 class="card-category">Total Total Submissions</h5>
+
                       <h4 class="card-title total-entries-count"><i
                           class="tim-icons icon-paper text-warning"></i>&nbsp;&nbsp;<span></span>
                       </h4>
@@ -191,8 +246,8 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-5 col-xl-5">
-              <div class="card card-chart">
+            <div class="col-lg-5 col-xl-5 ptr-none">
+              <div class="card card-chart" id="verificationStatusCard">
                 <div class="card-header">
                   <h5 class="card-category">Verification Status</h5>
                   <!--<h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> 763,215</h3> -->
@@ -204,8 +259,9 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-5 col-xl-5">
-              <div class="card card-chart">
+
+            <div class="col-lg-5 col-xl-5 ptr-none">
+              <div class="card card-chart" id="indexingWiseSubmissionsCard">
                 <div class="card-header">
                   <h5 class="card-category">Indexing-wise Submissions</h5>
                   <!--<h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> 763,215</h3> -->
@@ -220,8 +276,8 @@
           </div>
 
           <div class="row">
-            <div class="col-12">
-              <div class="card card-chart">
+            <div class="col-12 ptr-none">
+              <div class="card card-chart" id="indexingWiseVerificationCard">
                 <div class="card-header">
                   <h5 class="card-category">Indexing-wise Verification Status</h5>
                   <!--<h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> 763,215</h3> -->
@@ -236,8 +292,8 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-5 col-xl-5">
-              <div class="card card-chart">
+            <div class="col-lg-5 col-xl-5 ptr-none">
+              <div class="card card-chart" id="yearWiseSubmissionsCard">
                 <div class="card-header">
                   <h5 class="card-category">Year-wise Submissions</h5>
                   <!--<h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> 763,215</h3> -->
@@ -249,8 +305,8 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-7 col-xl-7">
-              <div class="card card-chart height700px">
+            <div class="col-lg-7 col-xl-7 ptr-none">
+              <div class="card card-chart" id="departmentWiseSubmissionsCard">
                 <div class="card-header">
                   <h5 class="card-category">Department-wise Submissions</h5>
                   <!--<h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> 763,215</h3> -->
@@ -263,8 +319,6 @@
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>
@@ -291,9 +345,16 @@
   <!-- Control Center for Black Dashboard: parallax effects, scripts for the example pages etc -->
   <script th:src="@{/assets/js/black-dashboard.min.js?v=1.0.0}"></script>
   <!-- Black Dashboard DEMO methods, don't include it in your project! -->
+  <!-- JQuery Ui -->
+  <script src="/assets/jqueryui/jquery-ui.js"></script>
   <script th:src="@{/assets/demo/demo.js}"></script>
   <script>
     $(document).ready(function () {
+      $('#verificationStatusCard, #indexingWiseSubmissionsCard, #indexingWiseVerificationCard, #yearWiseSubmissionsCard, #departmentWiseSubmissionsCard').draggable().resizable();
+
+      $('#resetPlacements').on('click', function () {
+        $('#verificationStatusCard, #indexingWiseSubmissionsCard, #indexingWiseVerificationCard, #yearWiseSubmissionsCard, #departmentWiseSubmissionsCard').css({ top: '', left: '', height: '', width: '' });
+      });
 
       $().ready(function () {
         $sidebar = $('.sidebar');

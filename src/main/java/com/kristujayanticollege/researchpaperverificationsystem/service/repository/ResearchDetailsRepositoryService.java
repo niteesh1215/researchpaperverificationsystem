@@ -23,6 +23,22 @@ public class ResearchDetailsRepositoryService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    // applied while retrieving details for the dashboard
+    Map<String, Object> filters;
+
+    public void setFilters(Map<String, Object> filters) {
+        this.filters = filters;
+
+        if (filters == null) {
+            queryFilters = null;
+            return;
+        }
+
+        generateQueryFilters();
+
+        System.out.println(queryFilters);
+    }
+
     private String createInsertQuery(List<ColumnMap> columnMaps) {
         String query = "insert into `research_details`(`group_id`,";
         String values = "values(?,";
@@ -169,14 +185,77 @@ public class ResearchDetailsRepositoryService {
         jdbcTemplate.update(sql, verificationStatusValue, researchDetailsRowId);
     }
 
+    public List<Integer> getDistinctYears() {
+        String sql = "SELECT DISTINCT year FROM `research_details`";
+        return jdbcTemplate.queryForList(sql, Integer.class);
+    }
+
+    // dashboard board details
+    String queryFilters;
+
+    void generateQueryFilters() {
+        String[] columnsNamesToApplyFilters = { "department", "year", "indexing", "verification_status" };
+
+        queryFilters = " WHERE";
+
+        for (int index = 0; index < columnsNamesToApplyFilters.length; index++) {
+            String columnName = columnsNamesToApplyFilters[index];
+
+            if (filters.containsKey(columnName) && filters.get(columnName) != null
+                    && ((List) filters.get(columnName)).size() > 0) {
+
+                queryFilters += " `" + columnName + "` IN (";
+
+                if (columnName == "year") {
+                    List<Integer> years = ((List<Integer>) filters.get(columnName));
+
+                    for (int i = 0; i < years.size(); i++) {
+                        queryFilters += " " + years.get(i);
+
+                        if (i != years.size() - 1)
+                            queryFilters += ", ";
+
+                    }
+
+                } else {
+                    List<String> years = ((List<String>) filters.get(columnName));
+
+                    for (int i = 0; i < years.size(); i++) {
+                        queryFilters += " '" + years.get(i) + "'";
+
+                        if (i != years.size() - 1)
+                            queryFilters += ", ";
+
+                    }
+                }
+
+                queryFilters += " ) AND";
+
+            }
+
+        }
+
+        queryFilters = queryFilters.substring(0, queryFilters.length() - 3);
+
+    }
+
     public Long getCount() {
+
         String sql = "SELECT COUNT(id) as count FROM `research_details`";
+
+        if (queryFilters != null)
+            sql += queryFilters;
 
         return jdbcTemplate.queryForObject(sql, Long.class);
     }
 
     public List<Map<String, Object>> getGroupByIndexingCount() {
-        String sql = "SELECT COUNT(id) as count, `indexing` FROM `research_details` GROUP BY `indexing`";
+
+        String sql = "SELECT COUNT(id) as count, `indexing` FROM `research_details`";
+        if (queryFilters != null)
+            sql += queryFilters;
+
+        sql += " GROUP BY `indexing`";
 
         List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
 
@@ -184,7 +263,12 @@ public class ResearchDetailsRepositoryService {
     }
 
     public List<Map<String, Object>> getGroupByDepartmentCount() {
-        String sql = "SELECT COUNT(id) as count, `department` FROM `research_details` GROUP BY `department`";
+        String sql = "SELECT COUNT(id) as count, `department` FROM `research_details`";
+
+        if (queryFilters != null)
+            sql += queryFilters;
+
+        sql += " GROUP BY `department`";
 
         List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
 
@@ -192,7 +276,12 @@ public class ResearchDetailsRepositoryService {
     }
 
     public List<Map<String, Object>> getGroupByVerificationStatusCount() {
-        String sql = "SELECT COUNT(id) as count, `verification_status` FROM `research_details` GROUP BY `verification_status`";
+        String sql = "SELECT COUNT(id) as count, `verification_status` FROM `research_details`";
+
+        if (queryFilters != null)
+            sql += queryFilters;
+
+        sql += " GROUP BY `verification_status`";
 
         List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
 
@@ -200,7 +289,12 @@ public class ResearchDetailsRepositoryService {
     }
 
     public List<Map<String, Object>> getGroupByYearWiseCount() {
-        String sql = "SELECT COUNT(id) as count, `year` FROM `research_details` GROUP BY `year`";
+        String sql = "SELECT COUNT(id) as count, `year` FROM `research_details`";
+
+        if (queryFilters != null)
+            sql += queryFilters;
+
+        sql += " GROUP BY `year`";
 
         List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
 
@@ -208,7 +302,12 @@ public class ResearchDetailsRepositoryService {
     }
 
     public List<Map<String, Object>> getGroupByVerificationStatusAndIndexingCount() {
-        String sql = "SELECT COUNT(id) as count, `verification_status`, `indexing` FROM `research_details` GROUP BY `verification_status`,`indexing`";
+        String sql = "SELECT COUNT(id) as count, `verification_status`, `indexing` FROM `research_details`";
+
+        if (queryFilters != null)
+            sql += queryFilters;
+
+        sql += " GROUP BY `verification_status`,`indexing`";
 
         List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
 

@@ -381,12 +381,26 @@ utilities = {
 dashboardView = {
   init: function () {
     this.getData();
+    this.addEventListeners();
+  },
+  filters: {
+    department: [],
+    year: [],
+    indexing: [],
+    verification_status: [],
   },
   getData: function () {
+    var data = dashboardView.filters.department.length != 0 || dashboardView.filters.year.length != 0 || dashboardView.filters.indexing.length != 0 || dashboardView.filters.verification_status.length != 0 ? dashboardView.filters : {};
+    var headers = {};
+    headers[header_csrf] = token_csrf;
     $.ajax({
-      type: "get",
+      type: "post",
       contentType: "application/json",
       url: "/dashboard-details",
+      data: JSON.stringify(data),
+      headers: headers,
+      dataType: 'json',
+      cache: false,
       timeout: 600000,
       success: function (data) {
         if (data.status === 'success')
@@ -401,7 +415,7 @@ dashboardView = {
     });
   },
   buildUiFromData: function (jsonData) {
-    $('.hidden').removeClass('hidden');
+    $('.dashboard-ui').removeClass('hidden');
     $('.loading-indicator').remove();
     $('.total-entries-count span').html(jsonData.total_entries);
     $('.total-uploads-count span').html(jsonData.uploads_count);
@@ -411,6 +425,8 @@ dashboardView = {
     dashboardView.displayIndexingWiseVerificationBarChart(jsonData.indexing_wise_verification_status_count);
     utilities.generateBarChart('departmentWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.department_count_list));
     utilities.generatePurpleLineChart('yearWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.year_wise_count));
+    if (dashboardView.filters.department.length == 0 || dashboardView.filters.year.length == 0 || dashboardView.filters.indexing.length == 0 || dashboardView.filters.verification_status.length == 0)
+      dashboardView.buildFiltersUi(jsonData);
   },
   getLabelCountPairJSONData: function (jsonArray) {
     var labelCountJSONData = {};
@@ -428,6 +444,7 @@ dashboardView = {
 
     return labelCountJSONData;
   },
+
 
   displayIndexingWiseVerificationBarChart: function (jsonArray) {
     var ctx = document.getElementById('indexingWiseverificationStatus').getContext("2d");
@@ -536,7 +553,96 @@ dashboardView = {
 
     utilities.gradientBarChartConfiguration.legend.display = false;
 
-  }
+  },
+
+  buildFiltersUi: function (jsonData) {
+    var departmentNameList = getArrayFromJsonArray(jsonData.department_count_list, 'department');
+
+    var yearList = getArrayFromJsonArray(jsonData.year_wise_count, 'year');
+
+    var indexNameList = getArrayFromJsonArray(jsonData.indexing_count_list, 'indexing');
+
+    var verificationStatusList = getArrayFromJsonArray(jsonData.verification_status_count_list, 'verification_status')
+
+    $('#filters').html('');
+
+    createFilterForm(departmentNameList, 'department');
+    createFilterForm(yearList, 'year');
+    createFilterForm(indexNameList, 'indexing');
+    createFilterForm(verificationStatusList, 'verification_status');
+
+    function createFilterForm(array, name) {
+      array.forEach(function (item) {
+        $('#filters').append(`
+        <div class="col-12 col-md-2 col-lg-4 col-xl-3 col-xxl-3">
+        <div class="form-check">
+        <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" value="${item}" data-name="${name}" >
+            ${item}
+            <span class="form-check-sign">
+                <span class="check"></span>
+            </span>
+        </label>
+        </div>
+        </div>
+        `);
+      });
+
+      $('#filters').append(`<div class="col-12 p-2"></div>`);
+    }
+
+    function getArrayFromJsonArray(jsonArray, fieldName) {
+      var array = [];
+      jsonArray.forEach(function (json) {
+        array.push(json[fieldName]);
+      });
+
+      return array;
+    }
+  },
+
+  addEventListeners: function () {
+    $('#showFilters').click(function () {
+      $('#filtersSection').toggleClass('hidden');
+    });
+
+    $('#filterClose').click(function (e) {
+      e.preventDefault();
+      $('#filtersSection').addClass('hidden');
+    });
+
+    $('#filtersForm').on('change', 'input[type=checkbox]', function (e) {
+
+      switch ($(e.target).attr('data-name')) {
+        case 'department': dashboardView.filters.department.push($(e.target).val()); break;
+        case 'year': dashboardView.filters.year.push($(e.target).val()); break;
+        case 'indexing': dashboardView.filters.indexing.push($(e.target).val()); break;
+        case 'verification_status': dashboardView.filters.verification_status.push($(e.target).val()); break;
+      }
+
+
+    });
+
+    $('#filtersResetButton').click(function (e) {
+      e.preventDefault();
+      dashboardView.filters = {
+        department: [],
+        year: [],
+        indexing: [],
+        verification_status: [],
+      };
+      dashboardView.getData();
+    });
+
+    $('#filtersApplyButton').click(function (e) {
+      e.preventDefault();
+
+      //calling get data to reflect filters applied
+      dashboardView.getData();
+    });
+  },
+
+
 };
 
 //upload menu option
@@ -1263,6 +1369,7 @@ fileUploadsListView = {
       utilities.functions.addTableSearchListener('#search', '#fileUploadListTable tr');
       $('#tableView').removeClass('hidden');
       $('#detailsView').addClass('hidden');
+      $(".selection-count").html('');
     });
 
     //re-verify button click listener
@@ -1536,7 +1643,116 @@ fileUploadsListView = {
         }
       });
 
+      function showVerificationInfoModel(verificationInfoJson) {
+        if (verificationInfoJson.id == null) {
+          utilities.showNotification('top', 'center', type.danger, '<strong>Not Found!</strong> Verification information is not available.');
+          return;
+        }
+        var modalBody = '<div class="row"><div class="col-12">';
+        /*checking if repository details are available or not by checking if fullName is not null.
+          checking only full name because if full name is present then other details will be present.
+        */
+        if (verificationInfoJson.fullName != null)
+          modalBody += `<div class="card">
+            <div class="card-header">
+                <h2 class="card-category">Details found in the repository</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-lg-6 col-xl-6">
+                        Full Name: <span class="text-info"> ${verificationInfoJson.fullName}</span>
+                    </div>
+                    <div class="col-12 col-lg-6 col-xl-6">
+                        Manuscript Title : <span class="text-info"> ${verificationInfoJson.manuscriptTitle}</span>
+                    </div>
+                    <div class="col-12 col-lg-6 col-xl-6">
+                        Journal Title : <span class="text-info"> ${verificationInfoJson.journalTitle}</span>
+                    </div>
+                    <div class="col-12 col-lg-6 col-xl-6">
+                        ISSN : <span class="text-info"> ${verificationInfoJson.issn}</span>
+                    </div>
+                    <div class="col-12 col-lg-6 col-xl-6">
+                        Volume Number : <span class="text-info"> ${verificationInfoJson.volumeNumber}</span>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>`;
 
+        // match info card
+        modalBody += `<div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-category">Match details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">`;
+
+        var matchStatusSpan = verificationInfoJson.fullNameMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+        modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+           Full Name Match: ${matchStatusSpan}
+       </div>`;
+
+        matchStatusSpan = verificationInfoJson.manuscriptTitleMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+        modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+          Manuscript Title Match: ${matchStatusSpan}
+        </div>`;
+
+        matchStatusSpan = verificationInfoJson.journalTitleMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+        modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+         Journal Title Match: ${matchStatusSpan}
+        </div>`;
+
+        matchStatusSpan = verificationInfoJson.issnMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+        modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+        ISSN Match: ${matchStatusSpan}
+        </div>`;
+
+        matchStatusSpan = verificationInfoJson.volumeNumberMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
+
+        modalBody += `<div class="col-12 col-lg-6 col-xl-6">
+        Volume Number Match: ${matchStatusSpan}
+        </div>`;
+
+        modalBody += '</div></div></div></div>';
+
+        //found url card
+
+        if ((verificationInfoJson.foundAtUrls != null) && (verificationInfoJson.foundAtUrls.length != 0)) {
+          modalBody += `<div class="col-12">
+          <div class="card">
+              <div class="card-header">
+                  <h2 class="card-category">Found Url</h5>
+              </div>
+              <div class="card-body">`;
+          var i = 1;
+          verificationInfoJson.foundAtUrls.forEach(function (url) {
+            modalBody += `<a href="${url}" target="_blank"><button class="btn btn-warning animation-on-hover" type="button">Visit Url ${i++}</button></a>`
+          });
+
+          modalBody += ` </div>
+            </div>
+          </div>
+        </div>`;
+        }
+        modalBody += '</div>';
+
+        console.log(modalBody);
+
+        $('#verificationInfoModal .modal-body').html(modalBody);
+
+        var confirmationModal = $('#verificationInfoModal');
+
+        confirmationModal.modal({
+          backdrop: 'static'
+        });
+
+        confirmationModal.modal('show');
+      }
 
 
     });
@@ -1546,113 +1762,3 @@ fileUploadsListView = {
 
 
 
-function showVerificationInfoModel(verificationInfoJson) {
-  if (verificationInfoJson.id == null) {
-    utilities.showNotification('top', 'center', type.danger, '<strong>Not Found!</strong> Verification information is not available.');
-    return;
-  }
-  var modalBody = '<div class="row"><div class="col-12">';
-  /*checking if repository details are available or not by checking if fullName is not null.
-    checking only full name because if full name is present then other details will be present.
-  */
-  if (verificationInfoJson.fullName != null)
-    modalBody += `<div class="card">
-      <div class="card-header">
-          <h2 class="card-category">Details found in the repository</h5>
-      </div>
-      <div class="card-body">
-          <div class="row">
-              <div class="col-12 col-lg-6 col-xl-6">
-                  Full Name: <span class="text-info"> ${verificationInfoJson.fullName}</span>
-              </div>
-              <div class="col-12 col-lg-6 col-xl-6">
-                  Manuscript Title : <span class="text-info"> ${verificationInfoJson.manuscriptTitle}</span>
-              </div>
-              <div class="col-12 col-lg-6 col-xl-6">
-                  Journal Title : <span class="text-info"> ${verificationInfoJson.journalTitle}</span>
-              </div>
-              <div class="col-12 col-lg-6 col-xl-6">
-                  ISSN : <span class="text-info"> ${verificationInfoJson.issn}</span>
-              </div>
-              <div class="col-12 col-lg-6 col-xl-6">
-                  Volume Number : <span class="text-info"> ${verificationInfoJson.volumeNumber}</span>
-              </div>
-          </div>
-      </div>
-    </div>
-  </div>`;
-
-  // match info card
-  modalBody += `<div class="col-12">
-  <div class="card">
-      <div class="card-header">
-          <h2 class="card-category">Match details</h5>
-      </div>
-      <div class="card-body">
-          <div class="row">`;
-
-  var matchStatusSpan = verificationInfoJson.fullNameMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
-
-  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
-     Full Name Match: ${matchStatusSpan}
- </div>`;
-
-  matchStatusSpan = verificationInfoJson.manuscriptTitleMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
-
-  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
-    Manuscript Title Match: ${matchStatusSpan}
-  </div>`;
-
-  matchStatusSpan = verificationInfoJson.journalTitleMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
-
-  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
-   Journal Title Match: ${matchStatusSpan}
-  </div>`;
-
-  matchStatusSpan = verificationInfoJson.issnMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
-
-  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
-  ISSN Match: ${matchStatusSpan}
-  </div>`;
-
-  matchStatusSpan = verificationInfoJson.volumeNumberMatch ? `<span class="text-success"> Matched</span>` : `<span class="text-danger"> Not Matched</span>`;
-
-  modalBody += `<div class="col-12 col-lg-6 col-xl-6">
-  Volume Number Match: ${matchStatusSpan}
-  </div>`;
-
-  modalBody += '</div></div></div></div>';
-
-  //found url card
-
-  if ((verificationInfoJson.foundAtUrls != null) && (verificationInfoJson.foundAtUrls.length != 0)) {
-    modalBody += `<div class="col-12">
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-category">Found Url</h5>
-        </div>
-        <div class="card-body">`;
-    var i = 1;
-    verificationInfoJson.foundAtUrls.forEach(function (url) {
-      modalBody += `<a href="${url}"><button class="btn btn-warning animation-on-hover" type="button">Visit Url ${i++}</button></a>`
-    });
-
-    modalBody += ` </div>
-      </div>
-    </div>
-  </div>`;
-  }
-  modalBody += '</div>';
-
-  console.log(modalBody);
-
-  $('#verificationInfoModal .modal-body').html(modalBody);
-
-  var confirmationModal = $('#verificationInfoModal');
-
-  confirmationModal.modal({
-    backdrop: 'static'
-  });
-
-  confirmationModal.modal('show');
-}
