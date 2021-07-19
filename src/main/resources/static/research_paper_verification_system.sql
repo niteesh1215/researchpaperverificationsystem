@@ -161,6 +161,9 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+/* isFormatted*/
+ALTER TABLE `research_paper_verification_system`.`research_details` 
+ADD COLUMN `isFormatted` TINYINT NULL DEFAULT 0 AFTER `verification_timestamp`;
 
 
 
