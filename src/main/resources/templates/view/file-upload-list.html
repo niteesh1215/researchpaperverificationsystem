@@ -4,10 +4,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'  https://maxcdn.bootstrapcdn.com https://ajax.googleapis.com https://use.fontawesome.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.trackjs.com https://cdnjs.cloudflare.com; font-src *;connect-src *; media-src *;">
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-      
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'  https://maxcdn.bootstrapcdn.com https://ajax.googleapis.com https://use.fontawesome.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.trackjs.com https://cdnjs.cloudflare.com; font-src *;connect-src *; media-src *;">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
     <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="./assets/img/favicon.png">
     <title>
@@ -89,6 +90,7 @@
                                     <span class="d-lg-none d-md-block">Search</span>
                                 </button>
                             </li>
+                            <!-- 
                             <li class="dropdown nav-item">
                                 <a href="javascript:void(0)" class="dropdown-toggle nav-link" data-toggle="dropdown">
                                     <div class="notification d-none d-lg-block d-xl-block"></div>
@@ -114,6 +116,7 @@
                                             class="nav-item dropdown-item">Another one</a></li>
                                 </ul>
                             </li>
+                        -->
                             <li class="dropdown nav-item">
                                 <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                                     <div class="photo">
@@ -125,11 +128,13 @@
                                     </p>
                                 </a>
                                 <ul class="dropdown-menu dropdown-navbar">
+                                    <!-- 
                                     <li class="nav-link"><a href="javascript:void(0)"
                                             class="nav-item dropdown-item">Profile</a></li>
                                     <li class="nav-link"><a href="javascript:void(0)"
                                             class="nav-item dropdown-item">Settings</a></li>
                                     <li class="dropdown-divider"></li>
+                                    -->
                                     <li class="nav-link">
                                         <form th:action="@{/logout}" method="post">
                                             <input type="submit" class="nav-item dropdown-item" value="Log Out" />
@@ -178,12 +183,11 @@
             </div>
 
             <!--verification info  model-->
-            <div class="modal fade" id="verificationInfoModal" tabindex="-1" role="dialog"
-                 aria-hidden="true">
+            <div class="modal fade" id="verificationInfoModal" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content bg-dark p-0 mb-4">
                         <div class="modal-header">
-                            <h4 class="modal-title text-warning" >Verification Information</h4>
+                            <h4 class="modal-title text-warning">Verification Information</h4>
                         </div>
                         <div class="modal-body">
 
@@ -192,8 +196,8 @@
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                         </div>
                     </div>
-                    <br/>
-                    <br/>
+                    <br />
+                    <br />
                 </div>
             </div>
 
@@ -415,6 +419,13 @@
     <script src="/assets/js/plugins/bootstrap-notify.js"></script>
     <!-- Control Center for Black Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="/assets/js/black-dashboard.min.js?v=1.0.0"></script>
+    <!--Excel to json convertor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/shim.min.js"
+        integrity="sha512-nPnkC29R0sikt0ieZaAkk28Ib7Y1Dz7IqePgELH30NnSi1DzG4x+envJAOHz8ZSAveLXAHTR3ai2E9DZUsT8pQ=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"
+        integrity="sha512-wBcFatf7yQavHQWtf4ZEjvtVz4XkYISO96hzvejfh18tn3OrJ3sPBppH0B6q/1SHB4OKHaNNUKqOmsiTGlOM/g=="
+        crossorigin="anonymous"></script>
     <!-- Black Dashboard DEMO methods, don't include it in your project! -->
     <script src="/assets/demo/demo.js"></script>
     <script>
@@ -472,6 +483,7 @@
             });
     </script>
 </body>
+
 </html>
 
 <!--
