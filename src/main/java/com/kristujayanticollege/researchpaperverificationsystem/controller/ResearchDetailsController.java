@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kristujayanticollege.researchpaperverificationsystem.service.other.FormatString;
 import com.kristujayanticollege.researchpaperverificationsystem.service.other.TransactionalService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ColumnMapRepositoryService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ResearchDetailsRepositoryService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.UploadRepositoryService;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 
 @RestController
 public class ResearchDetailsController {
@@ -36,8 +35,6 @@ public class ResearchDetailsController {
 
     @Autowired
     private UploadRepositoryService uploadRepositoryService;
-
-
 
     @PostMapping(path = "/save")
     public ResponseEntity<HashMap<String, String>> save(@RequestBody Map<String, Object> researchDetailsRows) {
@@ -70,6 +67,69 @@ public class ResearchDetailsController {
             System.out.println(e);
             return new ArrayList<Map<String, Object>>();
         }
+    }
+
+    @GetMapping(path = "get-research-details-with-formatting/{groupId}")
+    public @ResponseBody List<Map<String, Object>> getResearchDetailsByGroupIdWithMappedColumnName(
+            @PathVariable Long groupId) {
+        try {
+            return researchDetailsRepositoryService.getResearchDetailsByGroupIdWithMappedColumnName(groupId,
+                    columnMapRepositoryService.getAllMapping());
+        } catch (Exception e) {
+            System.out.println(e);
+            return new ArrayList<Map<String, Object>>();
+        }
+    }
+
+    @PostMapping(path = "get-professor-submission-count-list")
+    public @ResponseBody List<Map<String, Object>> getProferssorSubmissionCountList(
+            @RequestBody Map<String, Object> filters) {
+
+        List<Map<String, Object>> maps;
+
+        try {
+
+            if (filters == null)
+                researchDetailsRepositoryService.setFilters(null);
+            else if (filters.isEmpty())
+                researchDetailsRepositoryService.setFilters(null);
+            else
+                researchDetailsRepositoryService.setFilters(filters);
+
+            maps = researchDetailsRepositoryService.getProferssorSubmissionCountList();
+        } catch (Exception e) {
+            System.out.println(e);
+            maps = new ArrayList<Map<String, Object>>();
+        }
+        researchDetailsRepositoryService.setFilters(null);
+        return maps;
+    }
+
+    @PostMapping(path = "get-professor-submission-count-list-indexing-wise")
+    public @ResponseBody List<Map<String, Object>> getProferssorSubmissionCountListIndexingWise(
+            @RequestBody Map<String, Object> filters) {
+
+        List<Map<String, Object>> maps;
+        try {
+
+            if (filters == null)
+                researchDetailsRepositoryService.setFilters(null);
+            else if (filters.isEmpty())
+                researchDetailsRepositoryService.setFilters(null);
+            else
+                researchDetailsRepositoryService.setFilters(filters);
+
+            maps = researchDetailsRepositoryService.getProferssorSubmissionCountListIndexingWise();
+
+        } catch (Exception e) {
+            System.out.println(e);
+
+            maps = new ArrayList<Map<String, Object>>();
+
+        }
+
+        researchDetailsRepositoryService.setFilters(null);
+        return maps;
     }
 
     @PostMapping(path = "/add-new-row")

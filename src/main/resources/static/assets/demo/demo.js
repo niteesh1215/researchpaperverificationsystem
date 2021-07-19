@@ -156,7 +156,14 @@ utilities = {
     responsive: true,
   },
 
-  generatePurpleLineChart: function (id, jsonData) {
+  generatePurpleLineChart: function (id, jsonData, chartObject = undefined) {
+
+    if (chartObject != undefined) {
+      chartObject.data.labels = Object.keys(jsonData);
+      chartObject.data.datasets[0].data = Object.values(jsonData);
+      chartObject.update();
+      return chartObject;
+    }
     var ctx = document.getElementById(id).getContext("2d");
 
     var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
@@ -194,7 +201,13 @@ utilities = {
 
     return myChart;
   },
-  generateBarChart: function (id, jsonData) {
+  generateBarChart: function (id, jsonData, chartObject = undefined) {
+    if (chartObject != undefined) {
+      chartObject.data.labels = Object.keys(jsonData);
+      chartObject.data.datasets[0].data = Object.values(jsonData);
+      chartObject.update();
+      return chartObject;
+    }
     var ctx = document.getElementById(id).getContext("2d");
 
     var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
@@ -227,7 +240,14 @@ utilities = {
       options: this.gradientBarChartConfiguration
     });
   },
-  generatePieChart: function (id, jsonData, shade = pieChartShades.orange) {
+  generatePieChart: function (id, jsonData, shade = pieChartShades.orange, chartObject) {
+
+    if (chartObject != undefined) {
+      chartObject.data.labels = Object.keys(jsonData);
+      chartObject.data.datasets[0].data = Object.values(jsonData);
+      chartObject.update();
+      return chartObject;
+    }
 
     var ctx = document.getElementById(id).getContext("2d");
 
@@ -287,6 +307,13 @@ utilities = {
 
   },
   functions: {
+    downloadExcelFile: function (jsonData, filename) {
+      var dataWorkSheet = XLSX.utils.json_to_sheet(jsonData);
+      // A workbook is the name given to an Excel file
+      var wb = XLSX.utils.book_new() // make Workbook of Excel
+      XLSX.utils.book_append_sheet(wb, dataWorkSheet, 'sheet1')
+      XLSX.writeFile(wb, filename + '.xlsx');
+    },
     getTotalVerifiedCount: function (jsonObject) {
       var totalVerified = 0;
       jsonObject.forEach((row) => {
@@ -389,6 +416,13 @@ dashboardView = {
     indexing: [],
     verification_status: [],
   },
+  charts: {
+    verificationStatusChart: undefined,
+    indexingWiseSubmissionsChart: undefined,
+    indexingWiseVerificationBarChart: undefined,
+    departmentWiseSubmissionsChart: undefined,
+    yearWiseSubmissionsChart: undefined,
+  },
   getData: function () {
     var data = dashboardView.filters.department.length != 0 || dashboardView.filters.year.length != 0 || dashboardView.filters.indexing.length != 0 || dashboardView.filters.verification_status.length != 0 ? dashboardView.filters : {};
     var headers = {};
@@ -420,12 +454,15 @@ dashboardView = {
     $('.total-entries-count span').html(jsonData.total_entries);
     $('.total-uploads-count span').html(jsonData.uploads_count);
 
-    utilities.generatePieChart('verificationStatusChart', dashboardView.getLabelCountPairJSONData(jsonData.verification_status_count_list), pieChartShades.pink);
-    utilities.generatePieChart('indexingWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.indexing_count_list), pieChartShades.green);
-    dashboardView.displayIndexingWiseVerificationBarChart(jsonData.indexing_wise_verification_status_count);
-    utilities.generateBarChart('departmentWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.department_count_list));
-    utilities.generatePurpleLineChart('yearWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.year_wise_count));
-    if (dashboardView.filters.department.length == 0 || dashboardView.filters.year.length == 0 || dashboardView.filters.indexing.length == 0 || dashboardView.filters.verification_status.length == 0)
+
+
+    dashboardView.charts.verificationStatusChart = utilities.generatePieChart('verificationStatusChart', dashboardView.getLabelCountPairJSONData(jsonData.verification_status_count_list), pieChartShades.pink, dashboardView.charts.verificationStatusChart);
+    dashboardView.charts.indexingWiseSubmissionsChart = utilities.generatePieChart('indexingWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.indexing_count_list), pieChartShades.green, dashboardView.charts.indexingWiseSubmissionsChart);
+    dashboardView.charts.indexingWiseVerificationBarChart = dashboardView.displayIndexingWiseVerificationBarChart(jsonData.indexing_wise_verification_status_count, dashboardView.charts.indexingWiseVerificationBarChart);
+    dashboardView.charts.departmentWiseSubmissionsChart = utilities.generateBarChart('departmentWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.department_count_list), dashboardView.charts.departmentWiseSubmissionsChart);
+    dashboardView.charts.yearWiseSubmissionsChart = utilities.generatePurpleLineChart('yearWiseSubmissionsChart', dashboardView.getLabelCountPairJSONData(jsonData.year_wise_count), dashboardView.charts.yearWiseSubmissionsChart);
+
+    if (dashboardView.filters.department.length == 0 && dashboardView.filters.year.length == 0 && dashboardView.filters.indexing.length == 0 && dashboardView.filters.verification_status.length == 0)
       dashboardView.buildFiltersUi(jsonData);
   },
   getLabelCountPairJSONData: function (jsonArray) {
@@ -446,7 +483,7 @@ dashboardView = {
   },
 
 
-  displayIndexingWiseVerificationBarChart: function (jsonArray) {
+  displayIndexingWiseVerificationBarChart: function (jsonArray, chartObject = undefined) {
     var ctx = document.getElementById('indexingWiseverificationStatus').getContext("2d");
 
     var indexingArray = ['Web of Science', 'Scopus', 'UGC CARE', 'Refereed / Peer Reviewed'];
@@ -540,8 +577,16 @@ dashboardView = {
       datasets: [notVerifiedDataset, notFoundDataset, foundDataset],
     };
 
-    console.log([notVerifiedDataset, notFoundDataset, foundDataset]);
-    console.log([notVerifiedArray, notFoundArray, foundArray]);
+
+    if (chartObject != undefined) {
+      chartObject.data.labels = data.labels;
+      chartObject.data.datasets = data.datasets;
+      chartObject.update();
+      return chartObject;
+    }
+
+    //console.log([notVerifiedDataset, notFoundDataset, foundDataset]);
+    //console.log([notVerifiedArray, notFoundArray, foundArray]);
 
 
     utilities.gradientBarChartConfiguration.legend.display = true;
@@ -552,6 +597,8 @@ dashboardView = {
     });
 
     utilities.gradientBarChartConfiguration.legend.display = false;
+
+    return myChart;
 
   },
 
@@ -640,7 +687,68 @@ dashboardView = {
       //calling get data to reflect filters applied
       dashboardView.getData();
     });
+
+    //downloads***********************
+    $('#proferssorSubmissionCountList').click(function (e) {
+      var data = dashboardView.filters.department.length != 0 || dashboardView.filters.year.length != 0 || dashboardView.filters.indexing.length != 0 || dashboardView.filters.verification_status.length != 0 ? dashboardView.filters : {};
+      var headers = {};
+      headers[header_csrf] = token_csrf;
+
+      var downloadButton = $(this);
+
+      downloadButton.addClass('rotate-animation');
+      $.ajax({
+        type: "post",
+        contentType: "application/json",
+        url: "/get-professor-submission-count-list",
+        data: JSON.stringify(data),
+        headers: headers,
+        dataType: 'json',
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+          downloadButton.removeClass('rotate-animation');
+          utilities.functions.downloadExcelFile(data, 'professor-submission-count-list');
+        },
+        error: function (e) {
+          downloadButton.removeClass('rotate-animation');
+          utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> An error occurred. Failed to download the file');
+        
+        }
+      });
+    });
+
+    $('#proferssorSubmissionCountListIndexingWise').click(function (e) {
+      var data = dashboardView.filters.department.length != 0 || dashboardView.filters.year.length != 0 || dashboardView.filters.indexing.length != 0 || dashboardView.filters.verification_status.length != 0 ? dashboardView.filters : {};
+      var headers = {};
+      headers[header_csrf] = token_csrf;
+
+      var downloadButton = $(this);
+
+      downloadButton.addClass('rotate-animation');
+
+      $.ajax({
+        type: "post",
+        contentType: "application/json",
+        url: "/get-professor-submission-count-list-indexing-wise",
+        data: JSON.stringify(data),
+        headers: headers,
+        dataType: 'json',
+        cache: false,
+        timeout: 600000,
+        success: function (data) {
+          downloadButton.removeClass('rotate-animation');
+          utilities.functions.downloadExcelFile(data, 'professor-submission-count-list-indexing-wise');
+        },
+        error: function (e) {
+          downloadButton.removeClass('rotate-animation');
+          utilities.showNotification('top', 'center', type.warning, '<strong>Error!</strong> An error occurred. Failed to download the file');
+        }
+      });
+    });
+
   },
+
 
 
 };
@@ -687,7 +795,7 @@ uploadView = {
         fileChosen.textContent = 'No file selected.';
         return false;
       }
-      console.log(window.XLSX);
+      //console.log(window.XLSX);
 
       //XLSX.utils.json_to_sheet(data, 'out.xlsx');
 
@@ -1088,6 +1196,9 @@ fileUploadsListView = {
       <button type="button" data-index="${obj.id}" data-filename="${obj.fileName}" rel="tooltip" class="btn btn-warning btn-sm btn-round btn-icon view-button">
         <i class="fas fa-eye"></i>
       </button>
+      <button type="button" data-index="${obj.id}" data-filename="${obj.fileName}" rel="tooltip" class="btn btn-info btn-sm btn-round btn-icon download-button" tooltip="download">
+      <i class="tim-icons icon-cloud-download-93"></i>
+    </button>
       <button type="button" data="${obj.id}" rel="tooltip" class="btn btn-danger btn-sm btn-round btn-icon delete-button" tooltip="Delete">
         <i class="tim-icons icon-trash-simple"></i>
       </button>
@@ -1316,6 +1427,33 @@ fileUploadsListView = {
       $('#search').unbind();
       utilities.functions.addTableSearchListener('#search', '#detailsTableView table tr');
       fileUploadsListView.fetchResearchDetailsAndBuildUI();
+    });
+
+    //download button listener
+    $('#fileUploadListTable tbody').on('click', '.download-button', function () {
+      var id = $(this).attr("data-index");
+      var filename = $(this).attr("data-filename");
+      var downloadButton = $(this);
+      downloadButton.addClass('rotate-animation');
+
+      $.ajax({
+        type: "get",
+        contentType: "application/json",
+        url: `/get-research-details-with-formatting/${id}`,
+        dataType: 'json',
+        cache: false,
+        timeout: 6000000,
+        success: function (data) {
+          downloadButton.removeClass('rotate-animation');
+          utilities.functions.downloadExcelFile(data, filename);
+
+        },
+        error: function (e) {
+          downloadButton.removeClass('rotate-animation');
+          utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to download the file.');
+
+        }
+      });
     });
 
     //deleteButton listener
@@ -1594,6 +1732,8 @@ fileUploadsListView = {
 
       var headers = {};
       headers[header_csrf] = token_csrf;
+      var downloadButton = $(this);
+      downloadButton.addClass('rotate-animation');
 
       $.ajax({
         type: "post",
@@ -1605,7 +1745,9 @@ fileUploadsListView = {
         cache: false,
         timeout: 600000,
         success: function (data) {
+          downloadButton.removeClass('rotate-animation');
           if (data.status === 'success') {
+            
             fileUploadsListView.fetchResearchDetailsAndBuildUI();
             utilities.showNotification('top', 'center', type.success, '<strong>Success!</strong> Row(s) re-verified successfuly.');
 
@@ -1614,6 +1756,7 @@ fileUploadsListView = {
 
         },
         error: function (e) {
+          downloadButton.removeClass('rotate-animation');
           utilities.showNotification('top', 'center', type.danger, '<strong>Failed!</strong> Failed to re-verify the row(s).');
         }
       });

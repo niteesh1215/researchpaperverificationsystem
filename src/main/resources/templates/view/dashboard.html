@@ -104,6 +104,7 @@
                   <span class="d-lg-none d-md-block">Search</span>
                 </button>
               </li>
+              <!--
               <li class="dropdown nav-item">
                 <a href="javascript:void(0)" class="dropdown-toggle nav-link" data-toggle="dropdown">
                   <div class="notification d-none d-lg-block d-xl-block"></div>
@@ -124,6 +125,7 @@
                   <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Another one</a></li>
                 </ul>
               </li>
+              -->
               <li class="dropdown nav-item">
                 <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                   <div class="photo">
@@ -135,9 +137,11 @@
                   </p>
                 </a>
                 <ul class="dropdown-menu dropdown-navbar">
+                  <!--
                   <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Profile</a></li>
                   <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Settings</a></li>
                   <li class="dropdown-divider"></li>
+                  -->
                   <li class="nav-link">
                     <form th:action="@{/logout}" method="post">
                       <input type="submit" class="nav-item dropdown-item" value="Log Out" />
@@ -319,6 +323,53 @@
               </div>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-12 ptr-none">
+              <div class="card" id="downloadsCard">
+                <div class="card-header" >
+                  <h5>Downloads</h5>
+                </div>
+                <div class="card-body">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th class="text-center">#</th>
+                        <th>Description</th>
+                        <th class="text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="text-center">1</td>
+                        <td>Professor submission count list</td>
+                        <td class="td-actions text-right">
+                          <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-round btn-icon"
+                            id="proferssorSubmissionCountList">
+                            <i class="tim-icons icon-cloud-download-93"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="text-center">2</td>
+                        <td>Professor submission count list indexing wise</td>
+                        <td class="td-actions text-right">
+                          <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-round btn-icon"
+                            id="proferssorSubmissionCountListIndexingWise">
+                            <i class="tim-icons icon-cloud-download-93"></i>
+                          </button>
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -330,13 +381,13 @@
   <script th:src="@{/assets/js/core/popper.min.js}"></script>
   <script th:src="@{/assets/js/core/bootstrap.min.js}"></script>
   <script th:src="@{/assets/js/plugins/perfect-scrollbar.jquery.min.js}"></script>
-  <!--Excel to json convertor 
+  <!--Excel to json convertor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/shim.min.js"
     integrity="sha512-nPnkC29R0sikt0ieZaAkk28Ib7Y1Dz7IqePgELH30NnSi1DzG4x+envJAOHz8ZSAveLXAHTR3ai2E9DZUsT8pQ=="
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"
     integrity="sha512-wBcFatf7yQavHQWtf4ZEjvtVz4XkYISO96hzvejfh18tn3OrJ3sPBppH0B6q/1SHB4OKHaNNUKqOmsiTGlOM/g=="
-    crossorigin="anonymous"></script> -->
+    crossorigin="anonymous"></script> 
 
   <!-- Chart JS -->
   <script th:src="@{/assets/js/plugins/chartjs.min.js}"></script>
@@ -350,10 +401,10 @@
   <script th:src="@{/assets/demo/demo.js}"></script>
   <script>
     $(document).ready(function () {
-      $('#verificationStatusCard, #indexingWiseSubmissionsCard, #indexingWiseVerificationCard, #yearWiseSubmissionsCard, #departmentWiseSubmissionsCard').draggable().resizable();
+      $('#verificationStatusCard, #indexingWiseSubmissionsCard, #indexingWiseVerificationCard, #yearWiseSubmissionsCard, #departmentWiseSubmissionsCard, #downloadsCard').draggable().resizable();
 
       $('#resetPlacements').on('click', function () {
-        $('#verificationStatusCard, #indexingWiseSubmissionsCard, #indexingWiseVerificationCard, #yearWiseSubmissionsCard, #departmentWiseSubmissionsCard').css({ top: '', left: '', height: '', width: '' });
+        $('#verificationStatusCard, #indexingWiseSubmissionsCard, #indexingWiseVerificationCard, #yearWiseSubmissionsCard, #departmentWiseSubmissionsCard, #downloadsCard').css({ top: '', left: '', height: '', width: '' });
       });
 
       $().ready(function () {

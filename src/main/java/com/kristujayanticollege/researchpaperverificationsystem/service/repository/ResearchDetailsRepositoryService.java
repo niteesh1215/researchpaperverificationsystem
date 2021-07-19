@@ -35,8 +35,6 @@ public class ResearchDetailsRepositoryService {
         }
 
         generateQueryFilters();
-
-        System.out.println(queryFilters);
     }
 
     private String createInsertQuery(List<ColumnMap> columnMaps) {
@@ -155,10 +153,33 @@ public class ResearchDetailsRepositoryService {
         return true;
     }
 
+    public List<Map<String, Object>> getUnformattedRows() {
+        String sql = "SELECT * FROM `research_details` where `isFormatted=0";
+
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+        return rows;
+    }
+
     public List<Map<String, Object>> getResearchDetailsByGroupId(Long groupId) {
 
         String sql = "SELECT * FROM `research_details` WHERE `group_id` = ?";
 
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, new Object[] { groupId });
+
+        return rows;
+    }
+
+    public List<Map<String, Object>> getResearchDetailsByGroupIdWithMappedColumnName(Long groupId,
+            List<ColumnMap> columnMaps) {
+
+        String sql = "SELECT ";
+        for (ColumnMap columnMap : columnMaps) {
+            sql += "`" + columnMap.getColumnName() + "` as `" + columnMap.getMappedName() + "`, ";
+        }
+
+        sql += "`verification_status` as `Verification Status` ";
+
+        sql += "FROM `research_details` WHERE `group_id` = ?";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, new Object[] { groupId });
 
         return rows;
@@ -312,6 +333,38 @@ public class ResearchDetailsRepositoryService {
         List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
 
         return counts;
+    }
+
+    public List<Map<String, Object>> getProferssorSubmissionCountList() {
+        String sql = "SELECT `email_address` as `Email Address`, `name` as `Full Name`,  count(`email_address`) as `Submission Count` FROM `research_details`";
+
+        if (queryFilters != null)
+            sql += queryFilters;
+
+        sql += "  group by `email_address` order by `Submission Count` desc;";
+
+        List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
+
+        return counts;
+    }
+
+    public List<Map<String, Object>> getProferssorSubmissionCountListIndexingWise() {
+        String sql = "SELECT `email_address` as `Email Address`, `name` as `Full Name`, `indexing` as `Indexing`, count(`indexing`) as `Submission Count` FROM `research_details`";
+
+        if (queryFilters != null)
+            sql += queryFilters;
+
+        sql += " group by `indexing`,`email_address` order by `email_address` asc;";
+
+        List<Map<String, Object>> counts = jdbcTemplate.queryForList(sql);
+
+        return counts;
+    }
+
+
+    @Transactional
+    public void  saveFormattedRows(List<Map<String, Object>> rows) {
+        // TODO complete
     }
 
 }
