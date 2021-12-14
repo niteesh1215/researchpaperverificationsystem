@@ -13,6 +13,7 @@ import com.kristujayanticollege.researchpaperverificationsystem.service.reposito
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.VerificationDetailsRepositoryService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.verification.PeerReviewedVerificationService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.verification.ScopusVerificationService;
+import com.kristujayanticollege.researchpaperverificationsystem.service.verification.WebOfScienceVerificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -131,6 +132,8 @@ public class VerificationController {
 
 			PeerReviewedVerificationService peerReviewedVerificationService = new PeerReviewedVerificationService();
 
+			WebOfScienceVerificationService webOfScienceVerificationService = new WebOfScienceVerificationService();
+
 			for (int i = 0; i < ids.size(); i++) {
 				Map<String, Object> researchDetails = researchDetailsRepositoryService
 						.getResearchDetailsById(ids.get(i));
@@ -152,8 +155,10 @@ public class VerificationController {
 						System.out.println(peerReviewedVerificationService.foundUrls);
 						peerReviewedVerificationService.saveStatus(verificationRepositoryService,
 								researchDetailsRepositoryService);
+					} else if(row.getIndexing().equalsIgnoreCase("Web of Science")){
+						webOfScienceVerificationService.setResearchDetailsRow(row);
+						webOfScienceVerificationService.verify();
 					}
-				Thread.sleep(5000);
 
 			}
 
