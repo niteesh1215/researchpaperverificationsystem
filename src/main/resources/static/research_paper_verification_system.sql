@@ -1,6 +1,6 @@
 CREATE TABLE `research_paper_verification_system`.`research_details` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `group_id` BIGINT NOT NULL DEFAULT NULL,
+  `group_id` BIGINT NOT NULL DEFAULT -1,
   `date` VARCHAR(50) NULL DEFAULT NULL,
   `email_address` VARCHAR(100) NULL DEFAULT NULL,
   `salutation` VARCHAR(10) NULL DEFAULT NULL,
@@ -150,7 +150,7 @@ ALTER TABLE `research_paper_verification_system`.`verification_details`
 ADD COLUMN `found_url_1` VARCHAR(255) NULL DEFAULT '' AFTER `verification_match_percentage`,
 ADD COLUMN `found_url_2` VARCHAR(255) NULL DEFAULT '' AFTER `found_url_1`;
 
-CREATE TABLE `user` (
+CREATE TABLE `research_paper_verification_system`.`user` (
   `id` bigint NOT NULL,
   `active` bit(1) NOT NULL,
   `password` varchar(255) NOT NULL,

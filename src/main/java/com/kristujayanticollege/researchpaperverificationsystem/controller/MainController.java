@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kristujayanticollege.researchpaperverificationsystem.model.User;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.ResearchDetailsRepositoryService;
 import com.kristujayanticollege.researchpaperverificationsystem.service.repository.UploadRepositoryService;
 
@@ -31,8 +32,19 @@ public class MainController implements ErrorController {
 	@Autowired
 	WebClient.Builder webClientBuilder;
 
+	// @Autowired
+	// UserController userController;
+
 	@GetMapping(path = "/login")
 	public ModelAndView loginView(HttpServletRequest request) {
+		// User user = new User();
+		// user.setActive(true);
+		// user.setUserName("niteesh");
+		// user.setPassword("niteesh");
+		// user.setRoles("admin");
+
+		// userController.addNewUser(user);
+
 		try {
 			String referrer = request.getHeader("Referer");
 			if (referrer != null)

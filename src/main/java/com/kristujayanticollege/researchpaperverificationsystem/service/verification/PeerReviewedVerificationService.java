@@ -135,6 +135,8 @@ public class PeerReviewedVerificationService {
 
             List<String> urlList = new ArrayList<String>();
 
+            urlList.add(researchDetailsRow.getDoiUrlLink());
+
             for (HtmlElement element : elements) {
                 String newPageUrl = element.getAttribute("href");
 
@@ -148,6 +150,8 @@ public class PeerReviewedVerificationService {
             boolean javascriptEnabledFlag = true;
 
             String contentType = null;
+
+           
 
             for (int i = 0; i < urlList.size(); i++) {
                 if (contentType == null) {

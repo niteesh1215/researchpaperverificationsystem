@@ -28,7 +28,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RestController
 public class VerificationController {
 
-    @Autowired
+	@Autowired
 	private ResearchDetailsRepositoryService researchDetailsRepositoryService;
 
 	@Autowired
@@ -42,8 +42,8 @@ public class VerificationController {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-    
-    @GetMapping(path = "/verify-file/{id}")
+
+	@GetMapping(path = "/verify-file/{id}")
 	public @ResponseBody HashMap<String, String> verify(@PathVariable Long id) {
 
 		System.out.println(id);
@@ -69,6 +69,8 @@ public class VerificationController {
 
 			PeerReviewedVerificationService peerReviewedVerificationService = new PeerReviewedVerificationService();
 
+			WebOfScienceVerificationService webOfScienceVerificationService = new WebOfScienceVerificationService();
+
 			if (researchDetailsRows != null) {
 				for (int i = 0; i < researchDetailsRows.size(); i++) {
 
@@ -89,6 +91,11 @@ public class VerificationController {
 								peerReviewedVerificationService.verify();
 								System.out.println(peerReviewedVerificationService.foundUrls);
 								peerReviewedVerificationService.saveStatus(verificationRepositoryService,
+										researchDetailsRepositoryService);
+							} else if (researchDetailsRows.get(i).getIndexing().equalsIgnoreCase("Web of Science")) {
+								webOfScienceVerificationService.setResearchDetailsRow(researchDetailsRows.get(i));
+								webOfScienceVerificationService.verify();
+								webOfScienceVerificationService.saveStatus(verificationRepositoryService,
 										researchDetailsRepositoryService);
 							}
 
@@ -155,9 +162,11 @@ public class VerificationController {
 						System.out.println(peerReviewedVerificationService.foundUrls);
 						peerReviewedVerificationService.saveStatus(verificationRepositoryService,
 								researchDetailsRepositoryService);
-					} else if(row.getIndexing().equalsIgnoreCase("Web of Science")){
+					} else if (row.getIndexing().equalsIgnoreCase("Web of Science")) {
 						webOfScienceVerificationService.setResearchDetailsRow(row);
 						webOfScienceVerificationService.verify();
+						webOfScienceVerificationService.saveStatus(verificationRepositoryService,
+								researchDetailsRepositoryService);
 					}
 
 			}

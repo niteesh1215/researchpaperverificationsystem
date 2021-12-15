@@ -20,6 +20,7 @@ public class ResearchDetailsRow {
     private String issn;
     private String hIndexByScopus;
     private String isAffiliatedToKJC; // yes or no
+    private String doiUrlLink;
     private Map<String, Object> additionalDetails = new LinkedHashMap<>();
 
     @JsonProperty("id")
@@ -120,6 +121,16 @@ public class ResearchDetailsRow {
     @JsonProperty("is_authorship_affiliated_to_kjc")
     public void setAffiliatedToKJC(String isAffiliatedToKJC) {
         this.isAffiliatedToKJC = isAffiliatedToKJC;
+    }
+
+    @JsonProperty("doi_url_link")
+    public void setDoiUrlLink(String doiUrlLink) {
+        this.doiUrlLink = doiUrlLink;
+    }
+
+    @JsonProperty("doi_url_link")
+    public String getDoiUrlLink() {
+        return this.doiUrlLink;
     }
 
     @JsonAnyGetter
